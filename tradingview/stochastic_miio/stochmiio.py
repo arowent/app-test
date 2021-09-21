@@ -15,21 +15,27 @@ def get_candels(ticker, timeframe):
 
     return result
 
-def stoch_rsi(close, window=20, smooth1=5, smooth2=5):
-    '''Расчет StochRSIIndicator'''
-    stoch = momentum.StochRSIIndicator(close, window, smooth1, smooth2, fillna=True)
-    stochrsi = stoch.stochrsi()
-    lineK = stoch.stochrsi_k()
-    lineD = stoch.stochrsi_d()
+def calculation_ema(close, window=20):
+    '''
+    Формирование EMA
+    и добавление нового столбца в DataFrame Pandas ["ema"]
+    '''
+    ema_object = ta.trend.EMAIndicator(close, window)
+    ema = ema_object.ema_indicator()
 
-    return stochrsi, lineK, lineD
+    return ema
 
-def rsi_indicator(close, window=10):
-    '''Расчет StochasticOscillator'''
-    stoch = momentum.RSIIndicator(close, window, fillna=True)
-    rsi = stoch.rsi()
+def calculation_stochastic(high, low, close, window=20, smooth_window=5):
+    '''
+    Формирование Stochastic Oscillator и его сигнала
+    добавление нового столбца в DataFrame Pandas ["stochastic"]
+    '''
+    stochastic_object = ta.momentum.tsi(close, window, smooth_window)
+    # stochastic = stochastic_object.stoch()
+    # stochastic = stochastic_object.tsi()
+    # stochastic_signal = stochastic_object.stoch_signal()
 
-    return rsi
+    return stochastic_object
 
 def get_candels_dataframe(ticker, timeframe):
     '''Формирование полученных свечей в DataFrame'''
@@ -59,17 +65,8 @@ def get_candels_dataframe(ticker, timeframe):
         # 'volume': volume_data,
     })
 
-    signal = rsi_indicator(result['close'])
-    result['signal'] = signal
-    # -----------------------------------------------------
-    srsi, line_k, line_d = stoch_rsi(result['signal'])
-    result['srsi'] = srsi
-    result['%k'] = line_k
-    result['%d'] = line_d
-
-
-    
-    # result.to_excel('with_srsi.xlsx')
+    result['stochastic'] = calculation_stochastic(result['high'], result['low'], result['close'])
+    result['ema'] = calculation_ema(result['close'])
 
     return result
 
@@ -80,12 +77,13 @@ def main():
     timeframes = ['15m']
 
     for ticker in tickers:
-        print(colored(f'ticker = {ticker}', 'green', attrs=['bold']))
+        print(colored(f'\nticker = {ticker}', 'green', attrs=['bold']))
         for timeframe in timeframes:
-            print(colored(f'\n-----------------------------------------------------', 'blue', attrs=['bold']))
+            print(colored(f'-----------------------------------------------------', 'blue', attrs=['bold']))
             print(colored(f'timeframe = {timeframe}', 'blue', attrs=['bold']))
             trend = get_candels_dataframe(ticker, timeframe)
-            print(f'trend\n{trend}')
+            print(f'Output of the last 5 values from "trend":\n{trend.tail(5)}')
+
 
 if __name__ == "__main__":
     main()
