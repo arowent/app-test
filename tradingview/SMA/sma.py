@@ -8,6 +8,7 @@ import ta.momentum
 from termcolor import colored
 from ta import momentum, trend
 
+
 def get_candels(ticker, timeframe):
     '''Забираем свечи с binance'''
     binance = ccxt.binance()
@@ -15,21 +16,11 @@ def get_candels(ticker, timeframe):
 
     return result
 
-def stoch_rsi(close, window=20, smooth1=5, smooth2=5):
-    '''Расчет StochRSIIndicator'''
-    stoch = momentum.StochRSIIndicator(close, window, smooth1, smooth2, fillna=True)
-    stochrsi = stoch.stochrsi()
-    lineK = stoch.stochrsi_k()
-    lineD = stoch.stochrsi_d()
 
-    return stochrsi, lineK, lineD
+def sma_indicator(data, window=14):
+    number = trend.sma_indicator(data, window, fillna=True)
+    return number
 
-def rsi_indicator(close, window=10):
-    '''Расчет StochasticOscillator'''
-    stoch = momentum.RSIIndicator(close, window, fillna=True)
-    rsi = stoch.rsi()
-
-    return rsi
 
 def get_candels_dataframe(ticker, timeframe):
     '''Формирование полученных свечей в DataFrame'''
@@ -40,38 +31,30 @@ def get_candels_dataframe(ticker, timeframe):
     high_data = []
     low_data = []
     close_data = []
-    # volume_data = []
+    volume_data = []
 
     for candle in candles:
         dates.append(datetime.fromtimestamp(candle[0] / 1000.0).strftime('%d-%m-%Y %H:%M'))
-        open_data.append(candle[1])
-        high_data.append(candle[2])
-        low_data.append(candle[3])
+        # open_data.append(candle[1])
+        # high_data.append(candle[2])
+        # low_data.append(candle[3])
         close_data.append(candle[4])
         # volume_data.append(candle[5])
 
     result = pd.DataFrame(data={
         'dates': dates,
-        'open': open_data,
-        'high': high_data,
-        'low': low_data,
+        # 'open': open_data,
+        # 'high': high_data,
+        # 'low': low_data,
         'close': close_data,
         # 'volume': volume_data,
     })
-
-    signal = rsi_indicator(result['close'])
-    result['signal'] = signal
-    # -----------------------------------------------------
-    srsi, line_k, line_d = stoch_rsi(result['signal'])
-    result['srsi'] = srsi
-    result['%k'] = line_k
-    result['%d'] = line_d
-
-
     
-    # result.to_excel('with_srsi.xlsx')
+    result['sma'] = sma_indicator(result['close'])
 
     return result
+
+
 
 def main():
     '''Главный метод вызывающий остальные'''
@@ -84,8 +67,9 @@ def main():
         for timeframe in timeframes:
             print(colored(f'\n-----------------------------------------------------', 'blue', attrs=['bold']))
             print(colored(f'timeframe = {timeframe}', 'blue', attrs=['bold']))
-            trend = get_candels_dataframe(ticker, timeframe)
-            print(f'trend\n{trend}')
+            sma = get_candels_dataframe(ticker, timeframe)
+            print(sma)
+
 
 if __name__ == "__main__":
-    main()
+    result = main()

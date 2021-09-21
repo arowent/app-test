@@ -73,18 +73,21 @@ def create_last_line(ticker, timeframe):
     '''Переопределяем таблицу, забираем последние 14 закрытых свечей'''
     result = get_candels_dataframe(ticker, timeframe)
 
+    line_date = []
     line_close = []
     line_rsi = []
     line_k = []
     line_d = []
 
-    for i in range(len(result)-2, len(result)-16, -1):
+    for i in range(len(result)-2, len(result)-52, -1):
+        line_date.append(result['dates'][i])
         line_close.append(result['close'][i])
         line_rsi.append(result['rsi'][i])
         line_k.append(result['k'][i])
         line_d.append(result['d'][i])
 
     last_line = pd.DataFrame(data={
+        'dates': line_date,
         'close': line_close,
         'rsi': line_rsi,
         'k': line_k,
@@ -149,6 +152,7 @@ def zone(result):
 def line_indicator(result):
     '''Собираем сведения для формирвоания анализа линии D'''
 
+    line_date = []
     line_turn = []
     line_price = []
     line_type = []
@@ -158,16 +162,22 @@ def line_indicator(result):
             line_turn.append(result['d'][i])
             line_price.append(result['close'][i])
             line_type.append('Сопротивление')
+            line_date.append(result['dates'][i])
 
         if result['d'][i] in P.open(0, 20) and result['d'][i-1] > result['d'][i] < result['d'][i+1]:
             line_turn.append(result['d'][i])
             line_price.append(result['close'][i])
             line_type.append('Поддержка')
+            line_date.append(result['dates'][i])
+
+
+
 
     line_result = pd.DataFrame(data={
-        'Разворот D': line_turn,
-        'Цена': line_price,
-        'Тип линии': line_type,
+        'date': line_date,
+        'turn': line_turn,
+        'price': line_price,
+        'type_line': line_type,
     })
 
     return line_result
@@ -194,8 +204,8 @@ def creating_table(ticker, timeframe):
 
 def main():
     tickers = ['BTC/USDT']
-    timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
-    # timeframes = ['30m']
+    # timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
+    timeframes = ['1w']
 
     for ticker in tickers:
         print(colored(f'\nTicker = {ticker}', 'green', attrs=['bold']))
@@ -203,12 +213,21 @@ def main():
             print(colored(f'\n-----------------------------------------------------', 'blue', attrs=['bold']))
             print(colored(f'Timeframe = {timeframe}', 'blue', attrs=['bold']))
             # result = determining_the_position(ticker, timeframe)
-            result_analysis, result_line = creating_table(ticker, timeframe)
-            # print(result.dropna())
-            # print(colored(f'\nLAST TREND\n{last_trend}', attrs=['bold']))
-            print(colored(f'\nStochastic RSI', 'yellow', attrs=['bold']))
-            logger.info(f'{result_analysis}')
-            print(f'\n{result_line}')
+            result = create_last_line(ticker, timeframe)
+            analysis, line_d = creating_table(ticker, timeframe)
+            # print(colored(f'\nStochastic RSI', 'yellow', attrs=['bold']))
+            # logger.info(f'\nlast_line\n{result}')
+            # logger.info(f'\ntable\n{analysis}\nline_d\n')
+            # print(line_d.iloc[0]['Цена'])
+            # logger.info(f'analysis[2] = {analysis[2]}')
+            print(line_d)
+            print(f'Длина line_d = {len(line_d)}')
+
+            for i in range(len(line_d)):
+                print(f'Разворот: {line_d.iloc[i][0]}')
+                print(f'Цена: {line_d.iloc[i][1]}')
+                print(f'Линия: {line_d.iloc[i][2]}')
+
 
 if __name__ == "__main__":
     result = main()

@@ -21,6 +21,12 @@ def ema_indicator(data, window):
 
     return ema_number.round(4)
 
+def sma_indicator(data, window):
+    '''Расчет SMA'''
+    sma_number = trend.sma_indicator(data, window, fillna=True)
+
+    return sma_number.round(4)
+
 def get_candels_dataframe(ticker, timeframe):
     '''Формирование полученных свечей в DataFrame'''
     candles = get_candels(ticker, timeframe)
@@ -63,85 +69,72 @@ def color_detection(data):
 
     return color_ao
 
-def ema_and_color(ticker, timeframe):
+def indicator_and_color(ticker, timeframe, flag):
     '''Заполнение DataFrame'''
-    ema_periods = [3, 7, 9, 14, 18, 21, 26, 30, 40, 50, 64, 75, 90, 100, 120, 150, 180, 200]
+    periods = [3, 5, 7, 9, 11, 14, 18, 21, 26, 30, 40, 50, 64, 75, 90, 100, 120, 150, 180, 200]
     result = get_candels_dataframe(ticker, timeframe)
 
-    for ema_period in ema_periods:
-        result[f'{ema_period}'] = ema_indicator(result['close'], ema_period)
-        result[f'color({ema_period})'] = color_detection(result[f'{ema_period}'])
-    
-    result.to_excel('filling.xlsx')
+    if 'EMA' == flag:
+        for ema_period in periods:
+            result[f'{ema_period}'] = ema_indicator(result['close'], ema_period)
+            result[f'color({ema_period})'] = color_detection(result[f'{ema_period}'])
+    else:
+        for sma_period in periods:
+            result[f'{sma_period}'] = sma_indicator(result['close'], sma_period)
+            result[f'color({sma_period})'] = color_detection(result[f'{sma_period}'])
+    # result.to_excel('filling.xlsx')
     return result
-
-def trend_3_21(ticker, timeframe):
-    '''Вывод значение для таблицы от 3 до 21'''
-    result = ema_and_color(ticker, timeframe).tail(2).head(1).reset_index(drop=True)
-    trend = []
-
-    for key in result.loc[:, '3':'color(21)']:
-        trend.append(result[f'{key}'][0])
-
-    return trend
-
-def trend_26_75(ticker, timeframe):
-    '''Вывод значение для таблицы от 26 до 75'''
-    result = ema_and_color(ticker, timeframe).tail(2).head(1).reset_index(drop=True)
-    trend = []
-
-    for key in result.loc[:, '26':'color(75)']:
-        trend.append(result[f'{key}'][0])
-
-    return trend
-
-def trend_90_200(ticker, timeframe):
-    '''Вывод значение для таблицы от 90 до 200'''
-    result = ema_and_color(ticker, timeframe).tail(2).head(1).reset_index(drop=True)
-    trend = []
-
-    for key in result.loc[:, '90':'color(200)']:
-        trend.append(result[f'{key}'][0])
-
-    return trend
 
 def create_trend(ticker, timeframe):
     '''Группировка всех таблиц, вывод таблицы по всем значениям'''
-    result = ema_and_color(ticker, timeframe).tail(2).head(1).reset_index(drop=True)
-    trend = []
+    indicator = "Moving averages"
+    result_ema = indicator_and_color(ticker, timeframe, flag='EMA').tail(2).head(1).reset_index(drop=True)
+    result_sma = indicator_and_color(ticker, timeframe, flag='SMA').tail(2).head(1).reset_index(drop=True)
+    trend_ema = []
+    trend_sma = []
 
-    trend.append(ticker)
-    trend.append(timeframe)
+    trend_ema.append(ticker)
+    trend_ema.append(timeframe)
+    trend_ema.append(indicator)
+    trend_ema.append('EMA')
+    trend_sma.append(ticker)
+    trend_sma.append(timeframe)
+    trend_sma.append(indicator)
+    trend_sma.append('SMA')
 
-    for key in result.loc[:, '3':'color(200)']:
-        trend.append(result[f'{key}'][0])
+    for key in result_ema.loc[:, '3':'color(200)']:
+        trend_ema.append(result_ema[f'{key}'][0])
 
-    return trend
+    for key in result_sma.loc[:, '3':'color(200)']:
+        trend_sma.append(result_sma[f'{key}'][0])
+
+    return trend_ema, trend_sma
 
 def main():
     '''Главный метод вызывающий остальные'''
     tickers = ['BTC/USDT']
-    timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
-    # timeframes = ['15m']
+    # timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
+    timeframes = ['15m']
 
     for ticker in tickers:
         print(colored(f'ticker = {ticker}', 'green', attrs=['bold']))
         for timeframe in timeframes:
             print(colored(f'\n-----------------------------------------------------', 'blue', attrs=['bold']))
             print(colored(f'timeframe = {timeframe}', 'blue', attrs=['bold']))
-            line1 = trend_3_21(ticker, timeframe)
-            line2 = trend_26_75(ticker, timeframe)
-            line3 = trend_90_200(ticker, timeframe)
-            trend = create_trend(ticker, timeframe)
+            # line1 = trend_3_21(ticker, timeframe)
+            # line2 = trend_26_75(ticker, timeframe)
+            # line3 = trend_90_200(ticker, timeframe)
+            trend_ema, trend_sma = create_trend(ticker, timeframe)
 
-            print(colored(f'trend_3_21', 'magenta', attrs=['bold']))
-            print(line1)
-            print(colored(f'trend_26_75', 'magenta', attrs=['bold']))
-            print(line2)
-            print(colored(f'trend_90_200', 'magenta', attrs=['bold']))
-            print(line3)
+            # print(colored(f'trend_3_21', 'magenta', attrs=['bold']))
+            # print(line1)
+            # print(colored(f'trend_26_75', 'magenta', attrs=['bold']))
+            # print(line2)
+            # print(colored(f'trend_90_200', 'magenta', attrs=['bold']))
+            # print(line3)
             print(colored(f'TREND', 'yellow', attrs=['bold']))
-            print(trend)
+            print(f'EMA - {trend_ema},\n len = {trend_ema[3]}')
+            print(f'SMA - {trend_sma}')
 
 if __name__ == "__main__":
     result = main()
