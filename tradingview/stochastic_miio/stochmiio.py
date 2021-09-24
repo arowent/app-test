@@ -230,6 +230,18 @@ def trend_wave(data):
     except Exception as err:
         return j
 
+def trend_bars(data):
+    '''Определение количества БАР тренда'''
+    bars = 0
+
+    for i in range(0, len(data)):
+        if data['color'][i] == data['color'][0]:
+            bars += 1
+        else:
+            break
+
+    return bars
+
 
 def create_table(ticker, timeframe):
     result = get_candels_dataframe(ticker, timeframe)
@@ -240,16 +252,16 @@ def create_table(ticker, timeframe):
     strength = trend_strength(last_trend)
     phase = trend_phase(last_trend)
     wave = trend_wave(last_trend)
-    # bars = bars_count(time_frame, ticker)
-    # pattern = current_pattern(time_frame, ticker)
+    bars = trend_bars(last_trend)
 
     table = []
     table.append(ticker)
     table.append(timeframe)
     table.append(position)
     table.append(strength)
-    table.append(phase)
     table.append(wave)
+    table.append(phase)
+    table.append(bars)
 
     return table
 
