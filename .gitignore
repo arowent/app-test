@@ -9,6 +9,7 @@
 venv/*
 
 *.ipynb
+*.xlsx
 
 .idea/*
 
