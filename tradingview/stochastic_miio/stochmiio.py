@@ -255,6 +255,22 @@ def previous_bars(data, index):
     return line
 
 
+def get_movement(value):
+    '''Определение движения линии'''
+    print(f'get_movement(): {value}')
+    line = []
+
+    if value[0] > value[3]:
+        line.append("Вниз")
+        line.append("NO SHORTS")
+    else:
+        line.append("Вверх")
+        line.append("NO LONGS")
+
+    return line
+
+def get_zone(value):
+    pass
 
 def create_table(ticker, timeframe):
     '''Формирование таблицы'''
@@ -268,6 +284,7 @@ def create_table(ticker, timeframe):
     wave = trend_wave(last_trend)
     bars = trend_bars(last_trend)
     previous = previous_bars(result.tail(2), len(result) - 1)
+    movement = get_movement(previous)
 
 
     table = []
@@ -280,6 +297,8 @@ def create_table(ticker, timeframe):
     table.append(bars)
 
     table = table + previous
+    table.append(movement[0])
+    table.append(movement[1])
 
     return table
 
