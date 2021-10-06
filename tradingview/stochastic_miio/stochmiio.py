@@ -242,17 +242,33 @@ def trend_bars(data):
 
     return bars
 
+def previous_bars(data, index):
+    line = []
+
+    line.append(data["tsi"][index - 1])
+    line.append(data["ema"][index - 1])
+    line.append(data["signal"][index - 1])
+    line.append(data["tsi"][index])
+    line.append(data["ema"][index])
+    line.append(data["signal"][index])
+
+    return line
+
+
 
 def create_table(ticker, timeframe):
+    '''Формирование таблицы'''
     result = get_candels_dataframe(ticker, timeframe)
     last_trend = create_last_trend(result)
-    # print(f'create_table() | result:\n{result}')
+    print(f'create_table() | result:\n{result}')
     print(f'\ncreate_table() | last_trend:\n\n{last_trend}\n')
     position = trend_direction(last_trend)
     strength = trend_strength(last_trend)
     phase = trend_phase(last_trend)
     wave = trend_wave(last_trend)
     bars = trend_bars(last_trend)
+    previous = previous_bars(result.tail(2), len(result) - 1)
+
 
     table = []
     table.append(ticker)
@@ -262,6 +278,8 @@ def create_table(ticker, timeframe):
     table.append(wave)
     table.append(phase)
     table.append(bars)
+
+    table = table + previous
 
     return table
 
