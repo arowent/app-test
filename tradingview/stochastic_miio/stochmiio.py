@@ -78,7 +78,7 @@ def get_candels_dataframe(ticker, timeframe):
     result['color'] = color_detection(result['close'])
     result['position'] = determining_the_position(result['signal'])
 
-    result.to_excel('stochframe.xlsx')
+    # result.to_excel('stochframe.xlsx')
 
     return result.head(len(result)-1)
 
@@ -157,7 +157,7 @@ def create_last_trend(data):
         'position': last_position,
     })
 
-    last_trend.to_excel('last_trend.xlsx')
+    # last_trend.to_excel('last_trend.xlsx')
 
     return last_trend
 
@@ -269,8 +269,38 @@ def get_movement(value):
 
     return line
 
-def get_zone(value):
-    pass
+def get_level(data):
+    '''Определение уровня'''
+    level = '0.00'
+    print(f'\ndata["tsi"][0]: {data["tsi"][0]}\n')
+    data = data['tsi'][0]
+
+    try:
+        if data > 0:
+            if data in P.open(0, 0.20):
+                level = '+0.20'
+            elif data in P.open(0.20, 0.40):
+                level = '+0.20'
+            elif data in P.open(0.20, 0.60):
+                level = '+0.60'
+            elif data in P.open(0.60, 1):
+                level = '+0.60'
+        else:
+            if data in P.open(-0.20, 0):
+                level = '-0.20'
+            elif data in P.open(-0.40, -0.20):
+                level = '-0.20'
+            elif data in P.open(-0.60, -0.40):
+                level = '-0.40'
+            elif data in P.open(-1, -0.60):
+                level = '-0.60'
+
+        return level
+
+    except Exception as err:
+        return level
+
+
 
 def create_table(ticker, timeframe):
     '''Формирование таблицы'''
@@ -285,6 +315,8 @@ def create_table(ticker, timeframe):
     bars = trend_bars(last_trend)
     previous = previous_bars(result.tail(2), len(result) - 1)
     movement = get_movement(previous)
+    print(f'last_trend.head(1): {last_trend.head(1)}')
+    level = get_level(last_trend.head(1))
 
 
     table = []
@@ -295,10 +327,10 @@ def create_table(ticker, timeframe):
     table.append(wave)
     table.append(phase)
     table.append(bars)
-
     table = table + previous
     table.append(movement[0])
     table.append(movement[1])
+    table.append(level)
 
     return table
 
