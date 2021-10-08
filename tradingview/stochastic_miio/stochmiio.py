@@ -136,7 +136,7 @@ def create_last_trend(data):
     last_position = []
 
     start, flag = data['position'][len(data) - 1], data['close'][len(data) - 1]
-    # print(f'\ncreate_last_trend() | start: {start}, flag: {flag}\n')
+    print(f'\ncreate_last_trend() | start: {start}, flag: {flag}\n')
 
     for i in range(len(data) - 1, 0, -1):
         if data['position'][i] == start:
@@ -315,7 +315,7 @@ def create_table(ticker, timeframe):
     bars = trend_bars(last_trend)
     previous = previous_bars(result.tail(2), len(result) - 1)
     movement = get_movement(previous)
-    print(f'last_trend.head(1): {last_trend.head(1)}')
+    print(f'last_trend.head(1):\n {last_trend.head(1)}')
     level = get_level(last_trend.head(1))
 
 
@@ -340,8 +340,8 @@ def main():
 
     start_pivot = time.perf_counter()
     tickers = ['BTC/USDT']
-    # timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
-    timeframes = ['15m']
+    timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
+    # timeframes = ['15m']
 
     for ticker in tickers:
         print(colored(f'\nticker = {ticker}', 'green', attrs=['bold']))
