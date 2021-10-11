@@ -7,44 +7,49 @@ from termcolor import colored
 from ta import momentum, trend
 import time
 
+
 def get_candels(ticker, timeframe):
-    '''Забираем свечи с binance'''
+    """Забираем свечи с binance"""
 
     binance = ccxt.binance()
     result = binance.fetch_ohlcv(ticker, timeframe=timeframe, limit=500)
 
     return result
 
+
 def calculation_ema(close, window=5):
-    '''
+    """
     Формирование EMA
     и добавление нового столбца в DataFrame Pandas ["ema"]
-    '''
+    """
 
     ema_object = trend.EMAIndicator(close, window)
     ema = ema_object.ema_indicator()
 
     return ema.round(4)
 
+
 def calculation_tsi(close, longlen=20, shortlen=5):
-    '''
+    """
     Формирование Stochastic Oscillator и его сигнала
     добавление нового столбца в DataFrame Pandas ["tsi"]
-    '''
+    """
 
     tsi_object = momentum.tsi(close, window_slow=longlen, window_fast=shortlen) / 100
-    
+
     return tsi_object.round(4)
 
+
 def calculation_signal(tsi, ema):
-    '''Формирование сигнала гистограммы'''
+    """Формирование сигнала гистограммы"""
 
     signal = tsi - ema
 
     return signal.round(4)
 
+
 def get_candels_dataframe(ticker, timeframe):
-    '''Формирование полученных свечей в DataFrame'''
+    """Формирование полученных свечей в DataFrame"""
 
     candles = get_candels(ticker, timeframe)
 
@@ -78,16 +83,15 @@ def get_candels_dataframe(ticker, timeframe):
     result['color'] = color_detection(result['close'])
     result['position'] = determining_the_position(result['signal'])
 
-    # result.to_excel('stochframe.xlsx')
+    return result.head(len(result) - 1)
 
-    return result.head(len(result)-1)
 
 def color_detection(data):
-    '''
+    """
     Определение цвета бара
     бар выше предыдущего -> green
     бар ниже предыдущего -> red
-    '''
+    """
 
     # print(f'color_detection():\n{data}')
     color_signal = []
@@ -105,12 +109,13 @@ def color_detection(data):
 
     return color_signal
 
+
 def determining_the_position(data):
-    '''
+    """
     Определение позиции
     result["signal"] > 0 -> position_signal (1)
     result["signal"] < 0 -> position_signal (0)
-    '''
+    """
     position_signal = []
 
     for i in range(0, len(data)):
@@ -125,6 +130,7 @@ def determining_the_position(data):
     # print(f'\ncolor_signal():\n{color_signal}\n')
 
     return position_signal
+
 
 def create_last_trend(data):
     """Создаем новый тренд из элементов последней позиции выше/ниже 0"""
@@ -161,6 +167,7 @@ def create_last_trend(data):
 
     return last_trend
 
+
 # Анализ тренда
 # направление гистограммы
 # - определить силу тренда, а именно в каком силовом диапазоне 
@@ -170,15 +177,16 @@ def create_last_trend(data):
 # - количество бар в последней фазе
 
 def trend_direction(data):
-    '''определение позиции'''
+    """определение позиции"""
 
     if data['position'][0] == 0:
         return 'медвежий'
     else:
         return 'бычий'
 
+
 def trend_strength(data):
-    '''определение силы тренда'''
+    """определение силы тренда"""
 
     rang = 'слабый'
 
@@ -191,22 +199,24 @@ def trend_strength(data):
             rang = 'сильный'
         elif data['signal'][0] in P.open(0.60, 1) or data['signal'][0] in P.open(-1, -0.60):
             rang = 'максимум'
-        
+
         return rang
 
     except Exception as err:
         return rang
 
+
 def trend_phase(data):
-    '''Определение фазы тренда'''
+    """Определение фазы тренда"""
 
     if data['position'][0] == 0:
         return 'продажа'
     else:
         return 'покупка'
 
+
 def trend_wave(data):
-    '''Определение количества ВОЛН'''
+    """Определение количества ВОЛН"""
 
     color = []
     output_list = []
@@ -230,8 +240,9 @@ def trend_wave(data):
     except Exception as err:
         return j
 
+
 def trend_bars(data):
-    '''Определение количества БАР тренда'''
+    """Определение количества БАР тренда"""
     bars = 0
 
     for i in range(0, len(data)):
@@ -241,6 +252,7 @@ def trend_bars(data):
             break
 
     return bars
+
 
 def previous_bars(data, index):
     line = []
@@ -256,7 +268,7 @@ def previous_bars(data, index):
 
 
 def get_movement(value):
-    '''Определение движения линии'''
+    """Определение движения линии"""
     print(f'get_movement(): {value}')
     line = []
 
@@ -269,8 +281,9 @@ def get_movement(value):
 
     return line
 
+
 def get_level(data):
-    '''Определение уровня'''
+    """Определение уровня"""
     level = '0.00'
     print(f'\ndata["tsi"][0]: {data["tsi"][0]}\n')
     data = data['tsi'][0]
@@ -301,7 +314,6 @@ def get_level(data):
         return level
 
 
-
 def create_table(ticker, timeframe):
     '''Формирование таблицы'''
     result = get_candels_dataframe(ticker, timeframe)
@@ -317,7 +329,6 @@ def create_table(ticker, timeframe):
     movement = get_movement(previous)
     print(f'last_trend.head(1):\n {last_trend.head(1)}')
     level = get_level(last_trend.head(1))
-
 
     table = []
     table.append(ticker)
@@ -336,12 +347,12 @@ def create_table(ticker, timeframe):
 
 
 def main():
-    '''Главный метод вызывающий остальные'''
+    """Главный метод вызывающий остальные"""
 
     start_pivot = time.perf_counter()
     tickers = ['BTC/USDT']
-    timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
-    # timeframes = ['15m']
+    # timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
+    timeframes = ['3m']
 
     for ticker in tickers:
         print(colored(f'\nticker = {ticker}', 'green', attrs=['bold']))
