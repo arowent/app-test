@@ -362,7 +362,7 @@ def main():
             trend = get_candels_dataframe(ticker, timeframe)
             table = create_table(ticker, timeframe)
             # print(f'Output of the all values from "trend":\n\n{trend}')
-            # print(f'\ncreate_table:\n\n{table}')
+            # print(f'\ncreate_table:\n\n{table}')S
             print(colored(f'\ncreate_table: {table}', 'yellow', attrs=['bold']))
 
     print(f'\n[FINISH] main(): {time.perf_counter() - start_pivot}\n')
