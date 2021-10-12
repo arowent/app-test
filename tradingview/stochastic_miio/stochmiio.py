@@ -143,6 +143,7 @@ def create_last_trend(data):
 
     start, flag = data['position'][len(data) - 1], data['close'][len(data) - 1]
     print(f'\ncreate_last_trend() | start: {start}, flag: {flag}\n')
+    print(f'\ncreate_last_trend() | data:\n{len(data)}\n')
 
     for i in range(len(data) - 1, 0, -1):
         if data['position'][i] == start:
