@@ -35,7 +35,7 @@ if __name__ == '__main__':
     start_time = time.perf_counter()
     # result = get_candels('BTC/USDT', '5m')
     loop = asyncio.get_event_loop()
-    task = [loop.create_task(get_candels('BTC/USDT', '5m'))]
+    tasks = [loop.create_task(get_candels('BTC/USDT', '5m')), loop.create_task(writing_to_file())]
     loop.run_until_complete(asyncio.wait(task))
     loop.close()
     print(f'FINISH: {time.perf_counter() - start_time}')

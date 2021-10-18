@@ -24,3 +24,4 @@ if __name__ == '__main__':
     loop.run_until_complete(wait_tasks)
     loop.close()
     logger.info(f'FINISH: {time.perf_counter() - start_time}')
+    asyncio.run(main)

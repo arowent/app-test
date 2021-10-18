@@ -20,13 +20,13 @@ async def gr1():
 async def gr2():
     # Busy waits for a second, but we don't want to stick around...
     print('gr2 started work: {}'.format(tic()))
-    await asyncio.sleep(2)
+    await asyncio.sleep(20)
     print('gr2 Ended work: {}'.format(tic()))
 
 
 async def gr3():
     print("Let's do some stuff while the coroutines are blocked, {}".format(tic()))
-    await asyncio.sleep(1)
+    await asyncio.sleep(2)
     print("Done!")
 
 
