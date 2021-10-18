@@ -21,7 +21,7 @@ async def get_candels(ticker, timeframe):
 
     return result
 
-async def main():
+async def get_data():
     tickers = ['BTC/USDT', 'ETH/USDT']
     timeframes = ['5m', '15m']
     start_time = time.perf_counter()
@@ -40,12 +40,17 @@ async def main():
 
 async def data_recording(data):
     try:
-        with open(r'data_table.txt', 'w') as file:
+        with open(r'../tradingview/data_table.txt', 'w') as file:
             for i in data:
                 file.write(str(i) + '\n')
     except Exception as err:
         logger.error(f'Не получилось записать данные в файл! '
                      f'ERROR: {err.__str__()}')
+
+async def main():
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(get_data())
+    loop.close()
 
 
 if __name__ == '__main__':
