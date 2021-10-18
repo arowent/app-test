@@ -1,6 +1,8 @@
 import time
 import asyncio
 
+from logger import logger
+
 start = time.time()
 
 
@@ -28,11 +30,14 @@ async def gr3():
     print("Done!")
 
 
-loop = asyncio.get_event_loop()
-tasks = [
-    loop.create_task(gr1()),
-    loop.create_task(gr2()),
-    loop.create_task(gr3())
-]
-loop.run_until_complete(asyncio.wait(tasks))
-loop.close()
+if __name__ == '__main__':
+    start_time = time.perf_counter()
+    loop = asyncio.get_event_loop()
+    tasks = [
+        loop.create_task(gr1()),
+        loop.create_task(gr2()),
+        loop.create_task(gr3())
+    ]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
+    logger.info(f'FINISH: {time.perf_counter() - start_time}')
