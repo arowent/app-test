@@ -1,6 +1,8 @@
 import random
 from time import sleep
 import asyncio
+import time
+from termcolor import colored
 
 
 def task(pid):
@@ -29,10 +31,13 @@ async def asynchronous():
     await asyncio.wait(tasks)
 
 
-print('Synchronous:')
-synchronous()
+if __name__ == '__main__':
+    start_time = time.perf_counter()
+    print('Synchronous:')
+    synchronous()
 
-loop = asyncio.get_event_loop()
-print('\nAsynchronous:')
-loop.run_until_complete(asynchronous())
-loop.close()
+    loop = asyncio.get_event_loop()
+    print('\nAsynchronous:')
+    loop.run_until_complete(asynchronous())
+    loop.close()
+    print(colored(f'FINISH: {time.perf_counter() - start_time}', 'yellow', attrs=['bold']))
