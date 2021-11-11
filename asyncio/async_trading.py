@@ -9,7 +9,6 @@ from ta import momentum, trend
 
 async def get_candels(ticker, timeframe):
     """Забираем свечи с binance"""
-
     binance = ccxt.binance()
     result = binance.fetch_ohlcv(ticker, timeframe=timeframe, limit=100)
 
@@ -39,7 +38,6 @@ async def calculation_tsi(close, longlen=20, shortlen=5):
 
 async def calculation_signal(tsi, ema):
     """Формирование сигнала гистограммы"""
-
     signal = tsi - ema
 
     return signal.round(4)

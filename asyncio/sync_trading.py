@@ -83,13 +83,16 @@ def main():
     symbols = ['BTC/USDT',]
     timeframes = ['5m', '30m', '6h',]
     
-    for symbol in symbols:
+    try:
+        for symbol in symbols:
         # print(f'Symbol: {symbol}')
-        for timeframe in timeframes:
-            # print(f'Timeframe: {timeframe}')
-            candles = get_candels(symbol, timeframe)
-            dataframe = creating_dataframe(candles)
-            print(f'Symbol: {symbol} | Timeframe: {timeframe} | Status: Ok!')
+            for timeframe in timeframes:
+                # print(f'Timeframe: {timeframe}')
+                candles = get_candels(symbol, timeframe)
+                dataframe = creating_dataframe(candles)
+                print(f'Symbol: {symbol} | Timeframe: {timeframe} | Status: Ok!')
+    except Exception as err:
+        print(f'Symbol: {symbol} | Timeframe: {timeframe} | Status: Error - {err.__str__()}')
 
     print(f'\nFinish: {time.perf_counter() - start_time}\n')
 
