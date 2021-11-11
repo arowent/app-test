@@ -1,8 +1,6 @@
 import asyncio
 import time
 
-from logger import logger
-
 
 async def foo():
     print('Running in foo')
@@ -23,5 +21,4 @@ if __name__ == '__main__':
     wait_tasks = asyncio.wait(tasks)
     loop.run_until_complete(wait_tasks)
     loop.close()
-    logger.info(f'FINISH: {time.perf_counter() - start_time}')
-    asyncio.run(main)
+    print(f'FINISH: {time.perf_counter() - start_time}')

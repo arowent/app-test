@@ -1,10 +1,7 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/venv,virtualenv,pycharm,intellij,visualstudio
-# Edit at https://www.toptal.com/developers/gitignore?templates=venv,virtualenv,pycharm,intellij,visualstudio
-
-### Intellij ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
-# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+# My Settings
+venv/
+/venv
 
 venv/*
 
