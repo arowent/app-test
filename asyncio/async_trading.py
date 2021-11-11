@@ -5,6 +5,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 from ta import momentum, trend
+import itertools
 
 
 async def get_candels(ticker, timeframe):
@@ -69,8 +70,8 @@ async def creating_dataframe(candles):
         # 'volume': volume_data,
     })
 
-    result['ema'] = await calculation_ema(result['close'])
     result['tsi'] = await calculation_tsi(result['close'])
+    result['ema'] = await calculation_ema(result['tsi'])
     result['signal'] = await calculation_signal(result['tsi'], result['ema'])
 
 
@@ -79,7 +80,7 @@ async def creating_dataframe(candles):
 
 async def main():
     start_time = time.perf_counter()
-    symbols = ['BTC/USDT',]
+    symbols = ['BTC/USDT']
     timeframes = ['5m', '30m', '6h',]
     
     for symbol in symbols:
@@ -95,6 +96,8 @@ async def main():
 
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+    asyncio.run(main())
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(main())
+    # loop.close()
     
