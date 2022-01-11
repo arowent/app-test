@@ -21,7 +21,7 @@ def color_detection(data: pd.Series) -> pd.Series:
             else:
                 color.append('green')
         except KeyError:
-            color.append(np.nan)
+            color.append('green')
     return pd.Series(color)
 
 
@@ -196,10 +196,8 @@ class Strength:
                 strength.append('средний')
             elif index in P.open(4000, self.maxsize) or index in P.open(self.minsize, -4000):
                 strength.append('сильный')
-            elif index in P.open(0.6, 1) or index in P.open(-1, -0.6):
-                strength.append('максимум')
             else:
-                strength.append(np.nan)
+                strength.append('слабый')
         return pd.Series(strength)
 
     def strength_smiio(self) -> pd.Series:
@@ -216,5 +214,5 @@ class Strength:
             elif index in P.open(0.6, 1) or index in P.open(-1, -0.6):
                 strength.append('максимум')
             else:
-                strength.append(np.nan)
+                strength.append('слабый')
         return pd.Series(strength)
