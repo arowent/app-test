@@ -54,6 +54,8 @@ def get_candels_dataframe(symbol, timeframe):
     result['strength'] = tools.Strength(result['ao']).strength_ao()
     result['phase'] = tools.trend_phase(result['color'])
 
+    print(f'get_candels_dataframe | result:\n{result}')
+
     return result
 
 
@@ -151,6 +153,7 @@ def current_pattern(data):
 
 def table(symbol, timeframe):
     result = tools.last_trend(get_candels_dataframe(symbol, timeframe))
+    print(f'\ntable | result:\n{result}')
     table = list()
 
     ao = result.head(1).ao.values[0]
@@ -176,7 +179,7 @@ def table(symbol, timeframe):
 
 def main():
     symbols = ['BTC/USDT']
-    timeframes = ['15m']
+    timeframes = ['15m', '1h', '4h', '1d']
 
     for symbol in symbols:
         for timeframe in timeframes:

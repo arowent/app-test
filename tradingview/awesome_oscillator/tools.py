@@ -65,6 +65,7 @@ def trend_direction(data: pd.Series) -> pd.Series:
 
 def last_trend(data):
     """Creating a new table with the latest values of one trend direction"""
+    data = data.head(len(data)-1)
     result = data.reindex(index=data.index[::-1])
     direction = result.head(1)['direction'].values[0]
     table = []
