@@ -121,7 +121,7 @@ def current_pattern(data):
                     break
 
                 if data['color'][index + 1] == 'red' and data['color'][index] == 'green' and data['color'][
-                        index - 1] == 'green':
+                    index - 1] == 'green':
                     line.append(data['ao'][index + 1])
                     line.append(data['ao'][index])
                     line.append(data['ao'][index - 1])
@@ -139,7 +139,7 @@ def current_pattern(data):
                     break
 
                 if data['color'][index + 1] == 'green' and data['color'][index] == 'red' and data['color'][
-                        index - 1] == 'red':
+                    index - 1] == 'red':
                     line.append(data['ao'][index + 1])
                     line.append(data['ao'][index])
                     line.append(data['ao'][index - 1])
@@ -186,6 +186,37 @@ def main():
             print(f'\nsymbol: {symbol} | timeframe: {timeframe}\n')
             result = table(symbol, timeframe)
             print(result)
+
+
+def load_oscillator_signals_to_db(symbol, timeframe, indicator, data, exchange):
+    try:
+        new_row = exchange.stochastic_momentum_current.objects.update_or_create(
+            timeframe=timeframe,
+            symbol=symbol,
+            indicator=indicator,
+            defaults={
+                'trend_direction': data[0],
+                'trend_strength': data[1],
+                'wave_count': data[2],
+                'phase': data[3],
+                'bars_count': data[4],
+                'previous_bar_k': data[5],
+                'previous_bar_d': data[6],
+                'previous_bar_signal': data[7],
+                'current_bar_k': data[8],
+                'current_bar_d': data[9],
+                'current_bar_signal': data[10],
+                'line_direction': data[11],
+                'line_phase': data[12],
+                'level_k': data[13],
+                'level_d': data[14],
+                'level_signal': data[15],
+                'event': data[16],
+                'prescription': data[17],
+            }
+        )
+    except Exception as err:
+        logger.error(f'Unexpected error: {err.__str__()}')
 
 
 if __name__ == '__main__':

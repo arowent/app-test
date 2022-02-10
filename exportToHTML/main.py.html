@@ -1,0 +1,121 @@
+<html>
+<head>
+<title>main.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #c679dd; font-style: italic;}
+.s1 { color: #abb2bf;}
+.s2 { color: #a6b2c0;}
+.s3 { color: #61afef;}
+.s4 { color: #98c379;}
+.s5 { color: #d19a66;}
+.s6 { color: #59626f; font-style: italic;}
+</style>
+</head>
+<body bgcolor="#282c34">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+main.py</font>
+</center></td></tr></table>
+<pre><span class="s0">import </span><span class="s1">ccxt</span>
+<span class="s0">from </span><span class="s1">datetime </span><span class="s0">import </span><span class="s1">datetime</span>
+<span class="s0">import </span><span class="s1">pandas </span><span class="s0">as </span><span class="s1">pd</span>
+<span class="s0">import </span><span class="s1">content</span>
+
+
+<span class="s0">def </span><span class="s1">get_candles</span><span class="s2">(</span><span class="s1">symbol</span><span class="s3">: </span><span class="s1">str</span><span class="s2">, </span><span class="s1">timeframe</span><span class="s3">: </span><span class="s1">str </span><span class="s3">= </span><span class="s4">'1h'</span><span class="s2">, </span><span class="s1">limit</span><span class="s3">: </span><span class="s1">int </span><span class="s3">= </span><span class="s5">26</span><span class="s2">) </span><span class="s1">-&gt; list</span><span class="s3">:</span>
+    <span class="s6">&quot;&quot;&quot;Taking candles from binance&quot;&quot;&quot;</span>
+    <span class="s1">binance </span><span class="s3">= </span><span class="s1">ccxt</span><span class="s2">.</span><span class="s1">binance</span><span class="s2">()</span>
+    <span class="s1">result </span><span class="s3">= </span><span class="s1">binance</span><span class="s2">.</span><span class="s1">fetch_ohlcv</span><span class="s2">(</span><span class="s1">symbol</span><span class="s2">, </span><span class="s1">timeframe</span><span class="s2">, </span><span class="s1">limit</span><span class="s3">=</span><span class="s1">limit</span><span class="s2">)</span>
+
+    <span class="s0">return </span><span class="s1">result</span>
+
+
+<span class="s0">def </span><span class="s1">get_candles_dataframe</span><span class="s2">(</span><span class="s1">candles</span><span class="s3">: </span><span class="s1">list</span><span class="s2">) </span><span class="s1">-&gt; pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s3">:</span>
+    <span class="s6">&quot;&quot;&quot;Generating data in a DataFrame&quot;&quot;&quot;</span>
+    <span class="s1">dates </span><span class="s3">= </span><span class="s1">list</span><span class="s2">()</span>
+    <span class="s1">close_data </span><span class="s3">= </span><span class="s1">list</span><span class="s2">()</span>
+
+    <span class="s0">for </span><span class="s1">candle </span><span class="s0">in </span><span class="s1">reversed</span><span class="s2">(</span><span class="s1">candles</span><span class="s2">)</span><span class="s3">:</span>
+        <span class="s1">dates</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">datetime</span><span class="s2">.</span><span class="s1">fromtimestamp</span><span class="s2">(</span><span class="s1">candle</span><span class="s2">[</span><span class="s5">0</span><span class="s2">] </span><span class="s3">/ </span><span class="s5">1000.0</span><span class="s2">).</span><span class="s1">strftime</span><span class="s2">(</span><span class="s4">'%d.%m.%Y %H:%M'</span><span class="s2">))</span>
+        <span class="s1">close_data</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">candle</span><span class="s2">[</span><span class="s5">4</span><span class="s2">])</span>
+
+    <span class="s1">result </span><span class="s3">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s2">(</span><span class="s1">data</span><span class="s3">=</span><span class="s2">{</span>
+        <span class="s4">'dates'</span><span class="s3">: </span><span class="s1">dates</span><span class="s2">,</span>
+        <span class="s4">'close'</span><span class="s3">: </span><span class="s1">close_data</span><span class="s2">,</span>
+    <span class="s2">})</span>
+
+    <span class="s1">result </span><span class="s3">= </span><span class="s1">result</span><span class="s2">.</span><span class="s1">drop</span><span class="s2">(</span><span class="s1">result</span><span class="s2">.</span><span class="s1">head</span><span class="s2">(</span><span class="s5">1</span><span class="s2">).</span><span class="s1">index</span><span class="s2">.</span><span class="s1">values</span><span class="s2">[</span><span class="s5">0</span><span class="s2">])</span>
+
+    <span class="s0">return </span><span class="s1">result</span>
+
+
+<span class="s0">def </span><span class="s1">get_table</span><span class="s2">(</span><span class="s1">data</span><span class="s3">: </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s2">, </span><span class="s1">ath</span><span class="s3">: </span><span class="s1">int</span><span class="s2">) </span><span class="s1">-&gt; list</span><span class="s3">:</span>
+    <span class="s6">&quot;&quot;&quot;ATH change item 
+ 
+    Creating a list of elements: price at a given time on the '1h' timeframe, 
+    percentage change in price, ATH price at a given time, percentage change in ATH. 
+    &quot;&quot;&quot;</span>
+    <span class="s1">price_current </span><span class="s3">= </span><span class="s1">data</span><span class="s2">.</span><span class="s1">head</span><span class="s2">(</span><span class="s5">1</span><span class="s2">).</span><span class="s1">close</span><span class="s2">.</span><span class="s1">values</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]  </span><span class="s6"># price at the moment of time</span>
+    <span class="s1">price_previous </span><span class="s3">= </span><span class="s1">data</span><span class="s2">.</span><span class="s1">tail</span><span class="s2">(</span><span class="s5">1</span><span class="s2">).</span><span class="s1">close</span><span class="s2">.</span><span class="s1">values</span><span class="s2">[</span><span class="s5">0</span><span class="s2">]  </span><span class="s6"># price for the previous week</span>
+    <span class="s1">change_day </span><span class="s3">= </span><span class="s2">(((</span><span class="s1">price_current </span><span class="s3">- </span><span class="s1">price_previous</span><span class="s2">) </span><span class="s3">/ </span><span class="s1">price_previous</span><span class="s2">) </span><span class="s3">* </span><span class="s5">100</span><span class="s2">).</span><span class="s1">round</span><span class="s2">(</span><span class="s5">2</span><span class="s2">)  </span><span class="s6"># price change</span>
+    <span class="s1">change_ath </span><span class="s3">= </span><span class="s2">(((</span><span class="s1">price_current </span><span class="s3">- </span><span class="s1">ath</span><span class="s2">) </span><span class="s3">/ </span><span class="s1">ath</span><span class="s2">) </span><span class="s3">* </span><span class="s5">100</span><span class="s2">).</span><span class="s1">round</span><span class="s2">(</span><span class="s5">2</span><span class="s2">)  </span><span class="s6"># ath change</span>
+    <span class="s1">table </span><span class="s3">= </span><span class="s2">[</span><span class="s1">price_current</span><span class="s2">, </span><span class="s1">change_day</span><span class="s2">, </span><span class="s1">ath</span><span class="s2">, </span><span class="s1">change_ath</span><span class="s2">]</span>
+
+    <span class="s0">return </span><span class="s1">table</span>
+
+
+<span class="s0">def </span><span class="s1">main</span><span class="s2">()</span><span class="s3">:</span>
+    <span class="s6">&quot;&quot;&quot;Summary tables on ATH correction 
+ 
+    From: https://bytwork.com/articles/ath 
+ 
+    This is the highest price value for the entire existence of the cryptocurrency. 
+    This indicator shows how much the price of a certain cryptocurrency or coin has 
+    fallen as a percentage. This percentage shows how much the coin has 
+    fallen from its recorded historical maximum. 
+    &quot;&quot;&quot;</span>
+    <span class="s1">symbols </span><span class="s3">= </span><span class="s1">content</span><span class="s2">.</span><span class="s1">symbols</span>
+    <span class="s1">market </span><span class="s3">= </span><span class="s4">'Binance'</span>
+
+    <span class="s1">ticker </span><span class="s3">= </span><span class="s1">list</span><span class="s2">()</span>
+    <span class="s1">price_now </span><span class="s3">= </span><span class="s1">list</span><span class="s2">()</span>
+    <span class="s1">ath_day </span><span class="s3">= </span><span class="s1">list</span><span class="s2">()</span>
+    <span class="s1">store </span><span class="s3">= </span><span class="s1">list</span><span class="s2">()</span>
+    <span class="s1">ath_now </span><span class="s3">= </span><span class="s1">list</span><span class="s2">()</span>
+    <span class="s1">ath_correction </span><span class="s3">= </span><span class="s1">list</span><span class="s2">()</span>
+
+    <span class="s0">for </span><span class="s1">symbol </span><span class="s0">in </span><span class="s1">symbols</span><span class="s3">:</span>
+        <span class="s1">print</span><span class="s2">(</span><span class="s4">f'symbol: {</span><span class="s1">symbol</span><span class="s4">}'</span><span class="s2">)</span>
+        <span class="s1">candles </span><span class="s3">= </span><span class="s1">get_candles</span><span class="s2">(</span><span class="s1">symbol</span><span class="s2">)</span>
+        <span class="s1">result </span><span class="s3">= </span><span class="s1">get_candles_dataframe</span><span class="s2">(</span><span class="s1">candles</span><span class="s2">)</span>
+        <span class="s1">ath </span><span class="s3">= </span><span class="s1">content</span><span class="s2">.</span><span class="s1">aths</span><span class="s2">[</span><span class="s1">symbol</span><span class="s2">]</span>
+        <span class="s1">data </span><span class="s3">= </span><span class="s1">get_table</span><span class="s2">(</span><span class="s1">result</span><span class="s2">, </span><span class="s1">ath</span><span class="s2">)</span>
+
+        <span class="s1">ticker</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">symbol</span><span class="s2">)</span>
+        <span class="s1">price_now</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">data</span><span class="s2">[</span><span class="s5">0</span><span class="s2">])</span>
+        <span class="s1">ath_day</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">data</span><span class="s2">[</span><span class="s5">1</span><span class="s2">])</span>
+        <span class="s1">store</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">market</span><span class="s2">)</span>
+        <span class="s1">ath_now</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">data</span><span class="s2">[</span><span class="s5">2</span><span class="s2">])</span>
+        <span class="s1">ath_correction</span><span class="s2">.</span><span class="s1">append</span><span class="s2">(</span><span class="s1">data</span><span class="s2">[</span><span class="s5">3</span><span class="s2">])</span>
+
+    <span class="s1">result </span><span class="s3">= </span><span class="s1">pd</span><span class="s2">.</span><span class="s1">DataFrame</span><span class="s2">(</span><span class="s1">data</span><span class="s3">=</span><span class="s2">{</span>
+        <span class="s4">'ticker'</span><span class="s3">: </span><span class="s1">ticker</span><span class="s2">,</span>
+        <span class="s4">'price_current'</span><span class="s3">: </span><span class="s1">price_now</span><span class="s2">,</span>
+        <span class="s4">'percent'</span><span class="s3">: </span><span class="s1">ath_day</span><span class="s2">,</span>
+        <span class="s4">'exchange'</span><span class="s3">: </span><span class="s1">market</span><span class="s2">,</span>
+        <span class="s4">'ath_current'</span><span class="s3">: </span><span class="s1">ath_now</span><span class="s2">,</span>
+        <span class="s4">'correction'</span><span class="s3">: </span><span class="s1">ath_correction</span><span class="s2">,</span>
+    <span class="s2">})</span>
+
+    <span class="s1">result</span><span class="s2">.</span><span class="s1">to_excel</span><span class="s2">(</span><span class="s4">'table.xlsx'</span><span class="s2">, </span><span class="s4">'Группа 1 (Топ-альты)'</span><span class="s2">, </span><span class="s1">index</span><span class="s3">=</span><span class="s0">False</span><span class="s2">)</span>
+    <span class="s6"># print(result)</span>
+    <span class="s0">return </span><span class="s4">'Completed successfully!'</span>
+
+
+<span class="s0">if </span><span class="s1">__name__ </span><span class="s3">== </span><span class="s4">'__main__'</span><span class="s3">:</span>
+    <span class="s1">main</span><span class="s2">()</span>
+</pre>
+</body>
+</html>
