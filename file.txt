@@ -1,0 +1,10 @@
+test.py
+awesome_oscillator
+.ipynb_checkpoints
+test.dart
+stochastic_rsi
+stochastic_miio
+moving_averages
+data.xlsx
+SMA
+pivot_points

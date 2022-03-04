@@ -9,7 +9,7 @@ import tools
 
 def get_candles(symbol, timeframe):
     """Taking candles from binance"""
-    binance = ccxt.binance()
+    binance = ccxt.bybit()
     result = binance.fetch_ohlcv(symbol, timeframe, limit=100)
 
     return result
@@ -152,34 +152,36 @@ def current_pattern(data):
 
 
 def table(symbol, timeframe):
-    result = tools.last_trend(get_candels_dataframe(symbol, timeframe))
-    print(f'\ntable | result:\n{result}')
+    result = get_candels_dataframe(symbol, timeframe)
+    print(result)
+    # result = tools.last_trend(get_candels_dataframe(symbol, timeframe))
+    # print(f'\ntable | result:\n{result}')
     table = list()
 
-    ao = result.head(1).ao.values[0]
-    direction = result.head(1).direction.values[0]
-    strength = result.head(1).strength.values[0]
-    phase = result.head(1).phase.values[0]
-    bars = tools.trend_bars(result)
-    waves = tools.trend_wave(result)
-    pattern = current_pattern(result)
-    time = result.head(1).time.values[0]
+    # ao = result.head(1).ao.values[0]
+    # direction = result.head(1).direction.values[0]
+    # strength = result.head(1).strength.values[0]
+    # phase = result.head(1).phase.values[0]
+    # bars = tools.trend_bars(result)
+    # waves = tools.trend_wave(result)
+    # pattern = current_pattern(result)
+    # time = result.head(1).time.values[0]
 
-    table.append(ao)
-    table.append(direction)
-    table.append(strength)
-    table.append(waves)
-    table.append(phase)
-    table.append(bars)
-    table.append(pattern)
-    table.append(time)
+    # table.append(ao)
+    # table.append(direction)
+    # table.append(strength)
+    # table.append(waves)
+    # table.append(phase)
+    # table.append(bars)
+    # table.append(pattern)
+    # table.append(time)
 
-    return table
+    # return table
 
 
 def main():
     symbols = ['BTC/USDT']
-    timeframes = ['15m', '1h', '4h', '1d']
+    timeframes = ['1h']
 
     for symbol in symbols:
         for timeframe in timeframes:
