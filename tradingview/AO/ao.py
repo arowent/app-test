@@ -9,7 +9,7 @@ import tools
 
 def get_candles(symbol, timeframe):
     """Taking candles from binance"""
-    binance = ccxt.bybit()
+    binance = ccxt.binance()
     result = binance.fetch_ohlcv(symbol, timeframe, limit=100)
 
     return result
@@ -27,8 +27,7 @@ def get_candels_dataframe(symbol, timeframe):
     volume_data = list()
 
     for candle in candels:
-        dates.append(datetime.fromtimestamp(
-            candle[0] / 1000.0).strftime('%d.%m.%Y %H:%M'))
+        dates.append(datetime.fromtimestamp(candle[0] / 1000.0).strftime('%d.%m.%Y %H:%M'))
         time.append(candle[0])
         open_data.append(candle[1])
         high_data.append(candle[2])
@@ -53,8 +52,6 @@ def get_candels_dataframe(symbol, timeframe):
     result['direction'] = tools.trend_direction(result['ao'])
     result['strength'] = tools.Strength(result['ao']).strength_ao()
     result['phase'] = tools.trend_phase(result['color'])
-
-    print(f'get_candels_dataframe | result:\n{result}')
 
     return result
 
@@ -152,73 +149,39 @@ def current_pattern(data):
 
 
 def table(symbol, timeframe):
-    result = get_candels_dataframe(symbol, timeframe)
-    print(result)
-    # result = tools.last_trend(get_candels_dataframe(symbol, timeframe))
-    # print(f'\ntable | result:\n{result}')
+    result = tools.last_trend(get_candels_dataframe(symbol, timeframe))
     table = list()
 
-    # ao = result.head(1).ao.values[0]
-    # direction = result.head(1).direction.values[0]
-    # strength = result.head(1).strength.values[0]
-    # phase = result.head(1).phase.values[0]
-    # bars = tools.trend_bars(result)
-    # waves = tools.trend_wave(result)
-    # pattern = current_pattern(result)
-    # time = result.head(1).time.values[0]
+    ao = result.head(1).ao.values[0]
+    direction = result.head(1).direction.values[0]
+    strength = result.head(1).strength.values[0]
+    phase = result.head(1).phase.values[0]
+    bars = tools.trend_bars(result)
+    waves = tools.trend_wave(result)
+    pattern = current_pattern(result)
+    time = result.head(1).time.values[0]
 
-    # table.append(ao)
-    # table.append(direction)
-    # table.append(strength)
-    # table.append(waves)
-    # table.append(phase)
-    # table.append(bars)
-    # table.append(pattern)
-    # table.append(time)
+    table.append(ao)
+    table.append(direction)
+    table.append(strength)
+    table.append(waves)
+    table.append(phase)
+    table.append(bars)
+    table.append(pattern)
+    table.append(time)
 
-    # return table
+    return table
 
 
 def main():
     symbols = ['BTC/USDT']
-    timeframes = ['1h']
+    timeframes = ['15m']
 
     for symbol in symbols:
         for timeframe in timeframes:
             print(f'\nsymbol: {symbol} | timeframe: {timeframe}\n')
             result = table(symbol, timeframe)
             print(result)
-
-
-def load_oscillator_signals_to_db(symbol, timeframe, indicator, data, exchange):
-    try:
-        new_row = exchange.stochastic_momentum_current.objects.update_or_create(
-            timeframe=timeframe,
-            symbol=symbol,
-            indicator=indicator,
-            defaults={
-                'trend_direction': data[0],
-                'trend_strength': data[1],
-                'wave_count': data[2],
-                'phase': data[3],
-                'bars_count': data[4],
-                'previous_bar_k': data[5],
-                'previous_bar_d': data[6],
-                'previous_bar_signal': data[7],
-                'current_bar_k': data[8],
-                'current_bar_d': data[9],
-                'current_bar_signal': data[10],
-                'line_direction': data[11],
-                'line_phase': data[12],
-                'level_k': data[13],
-                'level_d': data[14],
-                'level_signal': data[15],
-                'event': data[16],
-                'prescription': data[17],
-            }
-        )
-    except Exception as err:
-        logger.error(f'Unexpected error: {err.__str__()}')
 
 
 if __name__ == '__main__':
