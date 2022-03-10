@@ -4,25 +4,28 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import portion as P
-from termcolor import colored
 from ta import momentum
 
-from logger import logger
+# from logger import logger
 
 
 def get_candels(ticker, timeframe):
-    binance = ccxt.binance()
-    result = binance.fetch_ohlcv(ticker, timeframe=timeframe, limit=500)
+    binance = ccxt.bybit()
+    result = binance.fetch_ohlcv(ticker, timeframe=timeframe, limit=40)
 
     return result
+
 
 def RSI_Indicator(close, window=14):
     rsi = momentum.RSIIndicator(close, window, fillna=True).rsi()
     return rsi
 
+
 def Stoch(high, low, close, window=14, smooth_window=3):
-    stoch = momentum.stoch(high, low, close, window, smooth_window, fillna=True)
+    stoch = momentum.stoch(high, low, close, window,
+                           smooth_window, fillna=True)
     return stoch
+
 
 def stochastic(data, window=14, k_window=3, d_window=3):
     min_val = data.rolling(window=window, center=False).min()
@@ -35,6 +38,7 @@ def stochastic(data, window=14, k_window=3, d_window=3):
 
     return round(K, 6), round(D, 6)
 
+
 def get_candels_dataframe(ticker, timeframe):
     candles = get_candels(ticker, timeframe)
 
@@ -46,7 +50,8 @@ def get_candels_dataframe(ticker, timeframe):
     volume_data = []
 
     for candle in candles:
-        dates.append(datetime.fromtimestamp(candle[0] / 1000.0).strftime('%d-%m-%Y %H:%M'))
+        dates.append(datetime.fromtimestamp(
+            candle[0] / 1000.0).strftime('%d-%m-%Y %H:%M'))
         open_data.append(candle[1])
         high_data.append(candle[2])
         low_data.append(candle[3])
@@ -65,9 +70,10 @@ def get_candels_dataframe(ticker, timeframe):
     # result['stoch'] = Stoch(result['high'], result['low'], result['close'])
     result['rsi'] = RSI_Indicator(result['close'], 14)
     result['k'], result['d'] = stochastic(result['rsi'])
-    result.to_excel('candels.xlsx')
-
+    # result.to_excel('candels.xlsx')
+    print(result.tail(5))
     return result
+
 
 def create_last_line(ticker, timeframe):
     '''Переопределяем таблицу, забираем последние 14 закрытых свечей'''
@@ -97,6 +103,7 @@ def create_last_line(ticker, timeframe):
     last_line.to_excel('last_line.xlsx')
     return last_line
 
+
 def motion(result):
     '''Определяем навправление движения Вверх/Вниз или Прямая'''
 
@@ -118,6 +125,7 @@ def motion(result):
         d = 'Вниз'
 
     return k, d
+
 
 def zone(result):
     '''Определяем в какой зоне находимся'''
@@ -149,6 +157,7 @@ def zone(result):
 
     return k, d
 
+
 def line_indicator(result):
     '''Собираем сведения для формирвоания анализа линии D'''
 
@@ -170,9 +179,6 @@ def line_indicator(result):
             line_type.append('Поддержка')
             line_date.append(result['dates'][i])
 
-
-
-
     line_result = pd.DataFrame(data={
         'date': line_date,
         'turn': line_turn,
@@ -181,7 +187,7 @@ def line_indicator(result):
     })
 
     return line_result
-    
+
 
 def creating_table(ticker, timeframe):
     result = create_last_line(ticker, timeframe)
@@ -202,31 +208,33 @@ def creating_table(ticker, timeframe):
 
     return analysis, line_d
 
+
 def main():
     tickers = ['BTC/USDT']
     # timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
-    timeframes = ['1w']
+    timeframes = ['4h']
 
     for ticker in tickers:
-        print(colored(f'\nTicker = {ticker}', 'green', attrs=['bold']))
+        # print(colored(f'\nTicker = {ticker}', 'green', attrs=['bold']))
         for timeframe in timeframes:
-            print(colored(f'\n-----------------------------------------------------', 'blue', attrs=['bold']))
-            print(colored(f'Timeframe = {timeframe}', 'blue', attrs=['bold']))
+            # print(colored(
+                # f'\n-----------------------------------------------------', 'blue', attrs=['bold']))
+            # print(colored(f'Timeframe = {timeframe}', 'blue', attrs=['bold']))
             # result = determining_the_position(ticker, timeframe)
-            result = create_last_line(ticker, timeframe)
-            analysis, line_d = creating_table(ticker, timeframe)
+            result = get_candels_dataframe(ticker, timeframe)
+            # analysis, line_d = creating_table(ticker, timeframe)
             # print(colored(f'\nStochastic RSI', 'yellow', attrs=['bold']))
             # logger.info(f'\nlast_line\n{result}')
             # logger.info(f'\ntable\n{analysis}\nline_d\n')
             # print(line_d.iloc[0]['Цена'])
             # logger.info(f'analysis[2] = {analysis[2]}')
-            print(line_d)
-            print(f'Длина line_d = {len(line_d)}')
+            # print(line_d)
+            # print(f'Длина line_d = {len(line_d)}')
 
-            for i in range(len(line_d)):
-                print(f'Разворот: {line_d.iloc[i][0]}')
-                print(f'Цена: {line_d.iloc[i][1]}')
-                print(f'Линия: {line_d.iloc[i][2]}')
+            # for i in range(len(line_d)):
+            #     print(f'Разворот: {line_d.iloc[i][0]}')
+            #     print(f'Цена: {line_d.iloc[i][1]}')
+            #     print(f'Линия: {line_d.iloc[i][2]}')
 
 
 if __name__ == "__main__":
