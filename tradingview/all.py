@@ -11,8 +11,8 @@ import time
 def get_candels(ticker, timeframe):
     """Забираем свечи с binance"""
 
-    binance = ccxt.binance()
-    result = binance.fetch_ohlcv(ticker, timeframe=timeframe, limit=40)
+    binance = ccxt.bybit()
+    result = binance.fetch_ohlcv(ticker, timeframe=timeframe, limit=50)
 
     return result
 
@@ -35,7 +35,8 @@ def calculation_tsi(close, longlen=20, shortlen=5):
     добавление нового столбца в DataFrame Pandas ["tsi"]
     """
 
-    tsi_object = momentum.tsi(close, window_slow=longlen, window_fast=shortlen) / 100
+    tsi_object = momentum.tsi(
+        close, window_slow=longlen, window_fast=shortlen) / 100
 
     return tsi_object.round(4)
 
@@ -54,34 +55,37 @@ def get_candels_dataframe(ticker, timeframe):
     candles = get_candels(ticker, timeframe)
 
     dates = []
-    # open_data = []
-    # high_data = []
-    # low_data = []
+    open_data = []
+    high_data = []
+    low_data = []
     close_data = []
     # volume_data = []
 
     for candle in candles:
-        dates.append(datetime.fromtimestamp(candle[0] / 1000.0).strftime('%d.%m.%Y %H:%M'))
-        # open_data.append(candle[1])
-        # high_data.append(candle[2])
-        # low_data.append(candle[3])
+        dates.append(datetime.fromtimestamp(
+            candle[0] / 1000.0).strftime('%d.%m.%Y %H:%M'))
+        open_data.append(candle[1])
+        high_data.append(candle[2])
+        low_data.append(candle[3])
         close_data.append(candle[4])
         # volume_data.append(candle[5])
 
     result = pd.DataFrame(data={
         'dates': dates,
-        # 'open': open_data,
-        # 'high': high_data,
-        # 'low': low_data,
+        'open': open_data,
+        'high': high_data,
+        'low': low_data,
         'close': close_data,
         # 'volume': volume_data,
     })
-
-    result['tsi'] = calculation_tsi(result['close'])
-    result['ema'] = calculation_ema(result['tsi'])
-    result['signal'] = calculation_signal(result['tsi'], result['ema'])
-    result['color'] = color_detection(result['close'])
-    result['position'] = determining_the_position(result['signal'])
+    result['ao'] = np.round(momentum.AwesomeOscillatorIndicator(result['high'], result['low'], 5, 34).awesome_oscillator().round(
+        4), 4)
+    # result['smiio (k)'] = calculation_tsi(result['close'])
+    result['K%'] = np.round(momentum.TSIIndicator(result['close'], 20, 5).tsi() / 100, 4)
+    result['D%'] = np.round(calculation_ema(result['K%']), 4)
+    result['Osc'] = np.round(calculation_signal(result['K%'], result['D%']), 4)
+    # result['color'] = color_detection(result['close'])
+    # result['position'] = determining_the_position(result['smiio (o)'])
 
     return result
 
@@ -171,7 +175,7 @@ def create_last_trend(data):
 
 # Анализ тренда
 # направление гистограммы
-# - определить силу тренда, а именно в каком силовом диапазоне 
+# - определить силу тренда, а именно в каком силовом диапазоне
 #   находится последняя закрытая свеча
 # - подсчитать количество волн на протяжении тренда
 # - определить в какой фазе находится последняя закрытая свеча
@@ -353,15 +357,17 @@ def main():
     start_pivot = time.perf_counter()
     tickers = ['BTC/USDT']
     # timeframes = ['5m', '15m', '30m', '1h', '4h', '6h', '12h', '1d', '1w']
-    timeframes = ['15m']
+    timeframes = ['1h']
 
     for ticker in tickers:
         print(colored(f'\nticker = {ticker}', 'green', attrs=['bold']))
         for timeframe in timeframes:
-            print(colored(f'-----------------------------------------------------', 'blue', attrs=['bold']))
+            print(colored(
+                f'-----------------------------------------------------', 'blue', attrs=['bold']))
             print(colored(f'timeframe = {timeframe}', 'blue', attrs=['bold']))
             trend = get_candels_dataframe(ticker, timeframe)
-            print(trend.tail(5))
+            print(trend.tail(8).loc[:, ['dates', 'close',
+                  'ao', 'K%', 'D%', 'Osc']])
             # table = create_table(ticker, timeframe)
             # print(f'Output of the all values from "trend":\n\n{trend}')
             # print(f'\ncreate_table:\n\n{table}')S
