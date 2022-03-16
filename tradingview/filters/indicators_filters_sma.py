@@ -1,8 +1,12 @@
 import ccxt
+import logging
 import pandas as pd
 import numpy as np
 from datetime import datetime
 from ta import momentum, trend
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 WINDOWS = [15, 30, 50, 75, 100, 120, 150, 180, 200]
 
@@ -35,7 +39,7 @@ def get_candels_dataframe(candels):
     return result
 
 
-def get_one_table(data: pd.DataFrame) -> list:
+def get_first_table(data: pd.DataFrame) -> list:
     """Solution for the first table"""
     numbers = [data[index].item() for index in data.loc[:, '15':'200']]
     points_one = list()
@@ -50,7 +54,7 @@ def get_one_table(data: pd.DataFrame) -> list:
     return points_one
 
 
-def get_two_table(data: pd.DataFrame) -> list:
+def get_second_table(data: pd.DataFrame) -> list:
     """Solution for the second table"""
     numbers = [data[index].item() for index in data.loc[:, '15':'200']]
     points_second = list()
@@ -65,17 +69,36 @@ def get_two_table(data: pd.DataFrame) -> list:
     return points_second
 
 
+def get_third_table(data: pd.DataFrame) -> list:
+    """Solution for the third table"""
+    row_previous = [data.head(1)[index].item() for index in data.head(1).loc[:, '15':'200']]
+    row_current = [data.tail(1)[index].item() for index in data.tail(1).loc[:, '15':'200']]
+    points_third = list()
+
+    if len(row_previous) == len(row_current):
+        for i in range(len(row_current)):
+            if row_current[i] > row_previous[i]:
+                points_third.append(1)
+            elif row_current[i] == row_previous[i]:
+                points_third.append(0)
+            else:
+                points_third.append(-1)
+    return points_third
+
+
 def main():
     symbol = 'BTC/USDT'
-    timeframe = '1h'
+    timeframe = '5m'
 
     candles = get_candles(symbol, timeframe)
-    print(get_candels_dataframe(candles).tail(10))
+    print(get_candels_dataframe(candles).tail(5))
     data = get_candels_dataframe(candles)
-    points_one = get_one_table(data)
-    # points_second = get_two_table(data.tail(1).loc[:, 'close':'200'])
-    print('Первая таблица: {} | Сумма: {}'.format(points_one, sum(points_one)))
-    # print('Вторая таблица: {} | Сумма: {}'.format(points_second, sum(points_second)))
+    points_first = get_first_table(data.tail(1))
+    points_second = get_second_table(data.tail(1))
+    points_third = get_third_table(data.tail(2))
+    print('\n[1T]: {} | Сумма: {}'.format(points_first, sum(points_first)))
+    print('[2T]: {} | Сумма: {}'.format(points_second, sum(points_second)))
+    print('[3T]: {} | Сумма: {}'.format(points_third, sum(points_third)))
 
 
 if __name__ == '__main__':
