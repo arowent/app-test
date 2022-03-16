@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Point(object):
     __instance = None
 
@@ -20,7 +21,7 @@ class Point(object):
 
 
 pt = Point('Aloha', 'Lopatko')
-pt2 = Point('Liza', 'Voroshilova')
+pt2 = Point('Arowent', 'Lopatko')
 
 print(pt.fullname())
 print(pt2.fullname())

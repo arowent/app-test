@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 from ta import momentum, trend
+import pprint
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -99,7 +100,8 @@ def main():
     print('\n[1T]: {} | Сумма: {}'.format(points_first, sum(points_first)))
     print('[2T]: {} | Сумма: {}'.format(points_second, sum(points_second)))
     print('[3T]: {} | Сумма: {}'.format(points_third, sum(points_third)))
-
+    result = dict([('first_table', points_first), ('second_table', points_second), ('third_table', points_third)])
+    pprint.pprint(result)
 
 if __name__ == '__main__':
     main()
