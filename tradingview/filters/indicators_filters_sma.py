@@ -35,12 +35,11 @@ def get_candels_dataframe(candels):
     return result
 
 
-def set_points(data):
+def get_one_table(data: pd.DataFrame) -> list:
+    """Solution for the first table"""
     numbers = [data[index].item() for index in data.loc[:, '15':'200']]
     points_one = list()
-    points_second = list()
 
-    # solution for the first table
     for index in range(len(numbers)):
         if numbers[index] > numbers[0]:
             points_one.append(1)
@@ -48,19 +47,22 @@ def set_points(data):
             points_one.append(0)
         else:
             points_one.append(-1)
+    return points_one
 
-    # solution for the second table
+
+def get_two_table(data: pd.DataFrame) -> list:
+    """Solution for the second table"""
+    numbers = [data[index].item() for index in data.loc[:, '15':'200']]
+    points_second = list()
+
     for index in range(len(numbers)):
-        if numbers[index] > data['close']:
-            points_second.append(1)
-        elif numbers[index] == numbers[0]:
+        if numbers[index] > data['close'].item():
+            points_second.append((-1))
+        elif numbers[index] == data['close'].item():
             points_second.append(0)
         else:
-            points_second.append(-1)
-    print('Сумма всех баллов = {}'.format(sum(points_second)))
-    result = {'one': points_one}
-    print(result)
-    return result
+            points_second.append(1)
+    return points_second
 
 
 def main():
@@ -70,7 +72,10 @@ def main():
     candles = get_candles(symbol, timeframe)
     print(get_candels_dataframe(candles).tail(10))
     data = get_candels_dataframe(candles)
-    result = set_points(data.tail(1).loc[:, 'close':'200'])
+    points_one = get_one_table(data)
+    # points_second = get_two_table(data.tail(1).loc[:, 'close':'200'])
+    print('Первая таблица: {} | Сумма: {}'.format(points_one, sum(points_one)))
+    # print('Вторая таблица: {} | Сумма: {}'.format(points_second, sum(points_second)))
 
 
 if __name__ == '__main__':

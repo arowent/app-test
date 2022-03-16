@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class Point(object):
     __instance = None
 
@@ -25,6 +24,3 @@ pt2 = Point('Liza', 'Voroshilova')
 
 print(pt.fullname())
 print(pt2.fullname())
-
-# for i in np.arange(0, 2 + 0.1, 0.2):
-#     print(np.round(i, 4))
