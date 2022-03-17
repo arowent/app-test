@@ -10,6 +10,7 @@ import pprint
 logging.basicConfig(level=logging.INFO)
 
 WINDOWS = [15, 30, 50, 75, 100, 120, 150, 180, 200]
+# WINDOWS = [10]
 
 
 def get_candles(symbol, timeframe):
@@ -35,7 +36,7 @@ def get_candels_dataframe(candels):
     })
 
     for window in WINDOWS:
-        result[f'{window}'] = trend.sma_indicator(result['close'], window, fillna=True)
+        result[f'{window}'] = trend.ema_indicator(result['close'], window, fillna=True)
 
     return result
 
@@ -74,22 +75,25 @@ def get_third_table(data: pd.DataFrame) -> list:
     """Solution for the third table"""
     row_previous = [data.head(1)[index].item() for index in data.head(1).loc[:, '15':'200']]
     row_current = [data.tail(1)[index].item() for index in data.tail(1).loc[:, '15':'200']]
+    columns = data.columns.tolist()[2:]
+    print(columns)
     points_third = list()
 
     if len(row_previous) == len(row_current):
         for i in range(len(row_current)):
             if row_current[i] > row_previous[i]:
-                points_third.append(1)
+                points_third.append({f'{columns[i]}': [1, np.round(row_current[i], 4), np.round(row_previous[i], 4)]})
+                print(data.get(row_current[i]))
             elif row_current[i] == row_previous[i]:
-                points_third.append(0)
+                points_third.append({f'{columns[i]}': [0, np.round(row_current[i], 4), np.round(row_previous[i], 4)]})
             else:
-                points_third.append(-1)
+                points_third.append({f'{columns[i]}': [-1, np.round(row_current[i], 4), np.round(row_previous[i], 4)]})
     return points_third
 
 
 def main():
     symbol = 'BTC/USDT'
-    timeframe = '5m'
+    timeframe = '1h'
 
     candles = get_candles(symbol, timeframe)
     print(get_candels_dataframe(candles).tail(5))
@@ -99,9 +103,10 @@ def main():
     points_third = get_third_table(data.tail(2))
     print('\n[1T]: {} | Сумма: {}'.format(points_first, sum(points_first)))
     print('[2T]: {} | Сумма: {}'.format(points_second, sum(points_second)))
-    print('[3T]: {} | Сумма: {}'.format(points_third, sum(points_third)))
+    # print('[3T]: {} | Сумма: {}'.format(points_third, sum(points_third)))
     result = dict([('first_table', points_first), ('second_table', points_second), ('third_table', points_third)])
     pprint.pprint(result)
+
 
 if __name__ == '__main__':
     main()
