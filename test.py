@@ -1,18 +1,30 @@
-from urllib import response
-import requests
-import json
+# import os
+#
+# # dir_name = "/home/user/code/app-test/tradingview"
+# dir_name = "/home/user/code/app-test/tradingview/AO/ao.py"
+#
+# if os.path.isdir(dir_name):
+#     print('Exist!')
+# else:
+#     print('This is not directory!')
+#
+# # message in Telegram
+# # dir_name = "/path/to/dir"
+# all_contains = list(filter(lambda x: os.path.isfile(os.path.join(dir_name, x)) and ".png" in x, os.listdir(dir_name)))
+# all_contains.sort(key=lambda filename: int(filename.split(".")[0]))
 
-"""
-Your user ID: 1081326703
-Current chat ID: 1081326703
-Forwarded from chat: -1001480116466
-"""
+import wsgiref.simple_server
 
 
-bot_token = '5124834812:AAFFjA59_uwsyYYi7sLp_9bIul4tSXfsPL4'
-chat_id = -1001480116466
+def hello_world(environ, start_response):
+    headers = [
+        ('Content-type', 'text/plain; charset=utf-8'),
+        ("Content–Security–Policy", "default–src 'none';"),
+    ]
+    start_response('200 OK', headers)
+    return [b"hello world", ]
 
-requests.get('https://api.telegram.org/bot{}/sendMessage'.format(bot_token), params=dict(
-   chat_id=str(chat_id),
-   text='You bitch!'
-))
+
+if __name__ == '__main__':
+    with wsgiref.simple_server.make_server('', 8000, hello_world) as server:
+        server.serve_forever()
