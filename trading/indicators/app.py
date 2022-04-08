@@ -3,9 +3,9 @@ import logging
 import datetime
 import pandas as pd
 import numpy as np
-from ta import momentum, trend
+from ta import momentum, trend, volatility
 
-from trading import indicators
+from trading import indicators, copy
 
 # Logging Confige
 logging.basicConfig(level=logging.INFO)
@@ -44,9 +44,9 @@ def get_candels_dataframe(candles):
 def main():
     candles = get_candles()
     df_candles = get_candels_dataframe(candles)
-    # logger.info(f'df_candles:\n{df_candles.tail(5)}')
-    # adx = indicators.ADX(df_candles['high'], df_candles['low'], df_candles['close'])
-    # logger.info(f'df_candles:\n{df_candles.tail(5)}')
+    df_candles['atr'] = copy.ADX(df_candles['high'], df_candles['low'], df_candles['close'])
+    print(df_candles.tail(5))
+    df_candles.to_excel('df_candles.xlsx')
 
 
 if __name__ == '__main__':

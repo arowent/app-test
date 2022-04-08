@@ -7,7 +7,7 @@ position_determination() -> position determination
 import sys
 import numpy as np
 import pandas as pd
-import portion as P
+# import portion as P
 import re
 
 
