@@ -46,13 +46,13 @@ class ADX:
             self._low.shift(1) - self._low > 0, self._low.shift(1) - self._low, 0
         )
 
-        self.smooth_true_range = pd.Series([i == 0 for i in range(len(self._high))])
+        self.smooth_true_range = pd.Series([0 for i in range(len(self._high))])
         self.smooth_true_range = self.smooth_true_range.shift(1).fillna(0) - (
                 self.smooth_true_range.shift(1).fillna(0) / self._window) + self.true_range
 
         self.smooth_direction_plus = pd.Series([i == 100 for i in range(len(self._high))])
         self.smooth_direction_plus = self.smooth_direction_plus.shift(1) - (
-                self.smooth_direction_plus.shift(1) / self._window) + self.direction_plus
+                self.smooth_direction_plus.shift(1) / self._window) + 1
 
         print(f'FINISH SMOOTH:\n{self.smooth_direction_plus[90:]}')
 

@@ -5,11 +5,10 @@ import datetime
 import pandas as pd
 import numpy as np
 from ta import trend, momentum, volatility
-import matplotlib.pyplot as plt
 from pivotpoints import fibonacci
 
 from pivotpoints.fibonacci import Fibonacci
-from pivotpoints import tools
+# from pivotpoints import tools
 
 # Logging Confige
 logging.basicConfig(level=logging.INFO)
