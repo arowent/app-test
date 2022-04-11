@@ -28,13 +28,17 @@ class ADX:
 
     def _run(self):
         self.dm_plus = self._high - self._high.shift(1)
-        self.dm_minus = self._low - self._low.shift(1)
+        self.dm_minus = self._low.shift(1) - self._low
+
         self.atr = volatility.AverageTrueRange(
             self._high, self._low, self._close).average_true_range()
+
         self.ema = trend.EMAIndicator(self._close).ema_indicator()
 
-        self.di_plus = 100 * \
-            (trend.EMAIndicator(self.dm_plus).ema_indicator() / self.atr)
+        self.di_plus = 100 * (trend.EMAIndicator(self.dm_plus).ema_indicator() / self.atr)
+        self.di_minus = 100 * (trend.EMAIndicator(self.dm_minus).ema_indicator() / self.atr)
+        print(f'self.di_plus:\n{self.di_plus}')
+        print(f'self.di_minus:\n{self.di_minus}')
         # print(f'TYPE: {self.atr})')
 
     def atr(self):

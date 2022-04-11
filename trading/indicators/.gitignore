@@ -1,9 +1,0 @@
-# My Settings
-
-.venv/
-venv/
-.idea/
-idea/
-.vscode/
-vscode
-__pycache__/

@@ -5,9 +5,9 @@ import pandas as pd
 import numpy as np
 from ta import momentum, trend, volatility
 
-from trading import indicators, copy
+# Logging Config
+from trading.indicators import copy, indicators
 
-# Logging Confige
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('app')
 
@@ -44,9 +44,13 @@ def get_candels_dataframe(candles):
 def main():
     candles = get_candles()
     df_candles = get_candels_dataframe(candles)
-    df_candles['atr'] = copy.ADX(df_candles['high'], df_candles['low'], df_candles['close'])
+    adx = copy.ADX(df_candles['high'], df_candles['low'], df_candles['close'])
+    # print(hasattr(result_adx, 'adx'))
+    df_candles['adx_pos'] = adx.adx_pos()
+    df_candles['adx_neg'] = adx.adx_neg()
+    df_candles['adx'] = adx.adx()
     print(df_candles.tail(5))
-    df_candles.to_excel('df_candles.xlsx')
+    # df_candles.to_excel('df_candles.xlsx')
 
 
 if __name__ == '__main__':

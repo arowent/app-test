@@ -5,6 +5,7 @@
 # friend, but it sure helps to know who your friends are. In this article,
 # we'll examine the value of ADX as a trend strength indicator.
 
+import logging
 import pandas as pd
 import numpy as np
 from ta import trend, momentum
@@ -19,6 +20,9 @@ class ADX:
             window: int = 14,
             th: int = 20,
     ):
+        self._dx = None
+        self._di_plus = None
+        self._di_minus = None
         self._high = high
         self._low = low
         self._close = close
@@ -50,48 +54,45 @@ class ADX:
         self.smooth_true_range = self.smooth_true_range.shift(1).fillna(0) - (
                 self.smooth_true_range.shift(1).fillna(0) / self._window) + self.true_range
 
-        self.smooth_direction_plus = pd.Series([i == 100 for i in range(len(self._high))])
+        self.smooth_direction_plus = pd.Series([0 for i in range(len(self._high))])
         self.smooth_direction_plus = self.smooth_direction_plus.shift(1) - (
                 self.smooth_direction_plus.shift(1) / self._window) + 1
 
-        print(f'FINISH SMOOTH:\n{self.smooth_direction_plus[90:]}')
-
-        self.smooth_direction_minus = pd.Series([i == 0 for i in range(len(self._high))])
+        self.smooth_direction_minus = pd.Series([0 for i in range(len(self._high))])
         self.smooth_direction_minus = self.smooth_direction_minus.shift(1) - (
                 self.smooth_direction_minus.shift(1) / self._window) + self.direction_minus
 
-        print(f'FINISH SMOOTH MINUS:\n{self.smooth_direction_minus[90:]}')
+        self._di_plus = self.smooth_direction_plus / self.smooth_true_range * 100
+        self._di_minus = self.smooth_direction_minus / self.smooth_true_range * 100
 
-        self.di_plus = self.smooth_direction_plus / self.smooth_true_range * 100
-        self.di_minus = self.smooth_direction_minus / self.smooth_true_range * 100
+        self._dx = abs((self._di_plus - self._di_minus).fillna(0) / (self._di_plus + self._di_minus)).fillna(0) * 100
+        logging.info(f'self._dx:\n{self._dx}')
+        self._adx = trend.SMAIndicator(self._dx, self._window).sma_indicator()
 
-        # self.dx = abs((self.di_plus - self.di_minus) / (self.di_plus + self.di_minus)) * 100
+        # df_result = pd.DataFrame(data={
+        #     'high': self._high,
+        #     'low': self._low,
+        #     'close': self._close,
+        #     'true_range': self.true_range,
+        #     'direction_plus': self.direction_plus,
+        #     'direction_minus': self.direction_minus,
+        #     'smooth_true_range': self.smooth_true_range,
+        #     'smooth_direction_plus': self.smooth_direction_plus,
+        #     'smooth_direction_minus': self.smooth_direction_minus,
+        #     'di_plus': self.di_plus,
+        #     'di_minus': self.di_minus,
+        #     # 'adx': self.adx,
+        # })
+        # df_result.to_excel('ADX_RESULT.xlsx')
+
+    def adx(self):
         # self.adx = trend.SMAIndicator(self.dx, self._window).sma_indicator()
-        # self.adx.to_excel('adx.xlsx')
-
-        # print(self.smooth_true_range)
-        # print(f'DIREC PLUS:\n{self.di_plus}')
-        df_result = pd.DataFrame(data={
-            'high': self._high,
-            'low': self._low,
-            'close': self._close,
-            'true_range': self.true_range,
-            'direction_plus': self.direction_plus,
-            'direction_minus': self.direction_minus,
-            'smooth_true_range': self.smooth_true_range,
-            'smooth_direction_plus': self.smooth_direction_plus,
-            'smooth_direction_minus': self.smooth_direction_minus,
-            'di_plus': self.di_plus,
-            'di_minus': self.di_minus,
-            # 'adx': self.adx,
-        })
-        df_result.to_excel('ADX_RESULT.xlsx')
-        # print(self.di_plus)
-
-        # print(self.smooth_true_range)
+        return self._adx
 
     def adx_pos(self):
-        return self.dm_plus
+        # self.adx = trend.SMAIndicator(self.dx, self._window).sma_indicator()
+        return self._di_plus
 
     def adx_neg(self):
-        return self._minus_di
+        # self.adx = trend.SMAIndicator(self.dx, self._window).sma_indicator()
+        return self._di_minus
