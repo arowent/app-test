@@ -1,0 +1,133 @@
+[
+  {
+    "timeframe": {
+      "id": 5,
+      "timeframe": "1h",
+      "timeframe_ru": "1 час"
+    },
+    "pivot_name": "Классические",
+    "pivot_dot": "S3",
+    "pivot_value": 42823.1667,
+    "label": "classic",
+    "order": null,
+    "symbol": {
+      "id": 1,
+      "symbol": "BTC/USDT"
+    }
+  },
+  {
+    "timeframe": {
+      "id": 5,
+      "timeframe": "1h",
+      "timeframe_ru": "1 час"
+    },
+    "pivot_name": "Классические",
+    "pivot_dot": "S2",
+    "pivot_value": 43348.6667,
+    "label": "classic",
+    "order": null,
+    "symbol": {
+      "id": 1,
+      "symbol": "BTC/USDT"
+    }
+  },
+  {
+    "timeframe": {
+      "id": 5,
+      "timeframe": "1h",
+      "timeframe_ru": "1 час"
+    },
+    "pivot_name": "Классические",
+    "pivot_dot": "S1",
+    "pivot_value": 43666.8333,
+    "label": "classic",
+    "order": null,
+    "symbol": {
+      "id": 1,
+      "symbol": "BTC/USDT"
+    }
+  },
+  {
+    "timeframe": {
+      "id": 5,
+      "timeframe": "1h",
+      "timeframe_ru": "1 час"
+    },
+    "pivot_name": "Классические",
+    "pivot_dot": "P",
+    "pivot_value": 43874.1667,
+    "label": "classic",
+    "order": null,
+    "symbol": {
+      "id": 1,
+      "symbol": "BTC/USDT"
+    }
+  },
+  {
+    "timeframe": {
+      "id": 5,
+      "timeframe": "1h",
+      "timeframe_ru": "1 час"
+    },
+    "pivot_name": "Классические",
+    "pivot_dot": "R1",
+    "pivot_value": 44192.3333,
+    "label": "classic",
+    "order": null,
+    "symbol": {
+      "id": 1,
+      "symbol": "BTC/USDT"
+    }
+  },
+  {
+    "timeframe": {
+      "id": 5,
+      "timeframe": "1h",
+      "timeframe_ru": "1 час"
+    },
+    "pivot_name": "Классические",
+    "pivot_dot": "R2",
+    "pivot_value": 44399.6667,
+    "label": "classic",
+    "order": null,
+    "symbol": {
+      "id": 1,
+      "symbol": "BTC/USDT"
+    }
+  },
+  {
+    "timeframe": {
+      "id": 5,
+      "timeframe": "1h",
+      "timeframe_ru": "1 час"
+    },
+    "pivot_name": "Классические",
+    "pivot_dot": "R3",
+    "pivot_value": 44925.1667,
+    "label": "classic",
+    "order": null,
+    "symbol": {
+      "id": 1,
+      "symbol": "BTC/USDT"
+    }
+  },
+  {
+    "r3": 34242.5,
+    "r2": 36624.213,
+    "r1": 38493.969,
+    "pp": 39807.25,
+    "s1": 41120.531,
+    "s2": 42745.438,
+    "s3": 45372.0,
+    "symbol": {
+      "id": 1,
+      "symbol_name": "BTCUSDT"
+    },
+    "timeframe": {
+      "id": 5,
+      "timeframe": "1h",
+      "timeframe_ru": "1 час",
+      "order": null
+    }
+  }
+]
