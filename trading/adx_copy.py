@@ -6,7 +6,7 @@ import numpy as np
 from ta import momentum, trend, volatility
 
 # Logging Config
-from trading.indicators import copy, indicators
+from indicators import copy, indicators
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('app')
