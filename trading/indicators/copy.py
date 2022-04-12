@@ -38,7 +38,7 @@ class ADX:
         self.direction_plus = np.where(
             (self._high - self._high.shift(1) > self._low.shift(1) - self._low),
             np.maximum(self._high - self._high.shift(1), 0), 0)
-        
+
         self.direction_minus = np.where(
             (self._low.shift(1) - self._low > self._high - self._high.shift(1)),
             np.maximum(self._low.shift(1) - self._low, 0), 0)
@@ -57,27 +57,38 @@ class ADX:
         for i in range(1, len(self.true_range)):
             #print(f'smooth_true_range [i]: {self.smooth_true_range} true_range = {self.true_range}')
             self.smooth_true_range.append(self.smooth_true_range[i-1] - (
-                self.smooth_true_range[i-1] / self._window) + self.true_range)
+                self.smooth_true_range[i-1] / self._window) + self.true_range.loc[i])
+
+        self.smooth_true_range = pd.Series(self.smooth_true_range)
 
         print(f'SMOOTH TRUE RANGE:\n{self.smooth_true_range}')
 
-        self.smooth_direction_plus = pd.Series(
-            [0 for i in range(len(self._high))])
-        self.smooth_direction_plus = self.smooth_direction_plus.shift(1).fillna(0) - (
-            self.smooth_direction_plus.shift(1).fillna(0) / self._window) + self.direction_plus
+        # self.smooth_direction_plus = pd.Series([0 for i in range(len(self._high))])
+        # self.smooth_direction_plus = self.smooth_direction_plus.shift(1).fillna(0) - (
+        #     self.smooth_direction_plus.shift(1).fillna(0) / self._window) + self.direction_plus
 
-        self.smooth_direction_minus = pd.Series(
-            [0 for i in range(len(self._high))])
-        self.smooth_direction_minus = self.smooth_direction_minus.shift(1).fillna(0) - (
-            self.smooth_direction_minus.shift(1).fillna(0) / self._window) + self.direction_minus
+        # smooth_direction_plus
+        self.smooth_direction_plus = [0]
+        for i in range(1, len(self.true_range)):
+            self.smooth_direction_plus.append(self.smooth_direction_plus[i-1] - (
+                self.smooth_direction_plus[i-1] / self._window) + self.direction_plus[i])
+        self.smooth_direction_plus = pd.Series(self.smooth_direction_plus)
 
-        self._di_plus = self.smooth_direction_plus / self.smooth_true_range * 100
-        self._di_minus = self.smooth_direction_minus / self.smooth_true_range * 100
+        # smooth_direction_minus
+        self.smooth_direction_minus = [0]
+        for i in range(1, len(self.true_range)):
+            self.smooth_direction_minus.append(self.smooth_direction_minus[i-1] - (
+                self.smooth_direction_minus[i-1] / self._window) + self.direction_minus[i])
+        self.smooth_direction_minus = pd.Series(self.smooth_direction_minus)
+
+
+        # result ADX
+        self._di_plus = np.round(self.smooth_direction_plus / self.smooth_true_range * 100, 1)
+        self._di_minus = np.round(self.smooth_direction_minus / self.smooth_true_range * 100, 1)
 
         self._dx = (abs(self._di_plus - self._di_minus) /
                        (self._di_plus + self._di_minus)) * 100
-        # logging.info(f'self._dx:\n{self._dx}')
-        self._adx = trend.SMAIndicator(self._dx, self._window).sma_indicator()
+        self._adx = np.round(trend.SMAIndicator(self._dx, self._window).sma_indicator(), 1)
 
         df_result = pd.DataFrame(data={
             'high': self._high,
