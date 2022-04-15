@@ -1,3 +1,6 @@
-def get_numbers(x, y, symbol):
-    if symbol == '*':
-        return x * y
+import os
+from pathlib import Path
+
+
+BASE_DIR = Path(__file__).resolve().parent
+print(os.path.abspath('BTC-USDT_4d.csv'))

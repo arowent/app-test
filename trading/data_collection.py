@@ -4,46 +4,45 @@ import numpy as np
 from pandas.core.indexes.base import Index
 from ta import momentum
 import sys
-import matplotlib.pyplot as plt
 
 PATH = r'C:\Users\ollko\Desktop\EmEl\btc-usd'
 PATHS = {
-    '5m': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_5m.csv',
-    '15m': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_15m.csv',
-    '30m': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_30m.csv',
-    '1h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_1h.csv',
-    '4h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_4h.csv',
-    '6h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_6h.csv',
-    '12h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_12h.csv',
-    '1d': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_1d.csv'
+    '5m': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_5m.csv',
+    '15m': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_15m.csv',
+    '30m': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_30m.csv',
+    '1h': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_1h.csv',
+    '4h': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_4h.csv',
+    '6h': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_6h.csv',
+    '12h': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_12h.csv',
+    '1d': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_1d.csv'
 }
 PATHS_ALL = {
-    '5m': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_5m.csv',
-    '15m': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_15m.csv',
-    '30m': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_30m.csv',
-    '1h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_1h.csv',
-    '3h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_3h.csv',
-    '4h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_4h.csv',
-    '6h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_6h.csv',
-    '12h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_12h.csv',
-    '1d': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_1d.csv',
-    '4d': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_4d.csv',
-    '1w': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_1w.csv',
-    '2w': r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_2w.csv'
+    '5m': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_5m.csv',
+    '15m': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_15m.csv',
+    '30m': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_30m.csv',
+    '1h': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_1h.csv',
+    '3h': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_3h.csv',
+    '4h': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_4h.csv',
+    '6h': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_6h.csv',
+    '12h': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_12h.csv',
+    '1d': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_1d.csv',
+    '4d': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_4d.csv',
+    '1w': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_1w.csv',
+    '2w': r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_2w.csv'
 }
 final_path = {
-    '5m': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_5m.csv',
-    '15m': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_15m.csv',
-    '30m': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_30m.csv',
-    '1h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_1h.csv',
-    '3h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_3h.csv',
-    '4h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_4h.csv',
-    '6h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_6h.csv',
-    '12h': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_12h.csv',
-    '1d': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_1d.csv',
-    '4d': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_4d.csv',
-    '1w': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_1w.csv',
-    '2w': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_2w.csv'
+    '5m': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_5m.csv',
+    '15m': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_15m.csv',
+    '30m': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_30m.csv',
+    '1h': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_1h.csv',
+    '3h': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_3h.csv',
+    '4h': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_4h.csv',
+    '6h': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_6h.csv',
+    '12h': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_12h.csv',
+    '1d': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_1d.csv',
+    '4d': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_4d.csv',
+    '1w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_1w.csv',
+    '2w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_2w.csv'
 }
 def add_missing_tf():
     ohlc_dict = {
@@ -61,19 +60,19 @@ def add_missing_tf():
         df.to_csv(PATHS[tf])
         if tf == '1h':
             df = df.resample('3H').agg(ohlc_dict)
-            df.to_csv(r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_3h.csv')
+            df.to_csv(r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_3h.csv')
         elif tf == '1d':
             df = df.resample('7D').agg(ohlc_dict)
-            df.to_csv(r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_1w.csv')
+            df.to_csv(r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_1w.csv')
             df = df.resample('14D').agg(ohlc_dict)
-            df.to_csv(r'C:\Users\ollko\Desktop\EmEl\btc-usd\BTC-USD_2w.csv')
+            df.to_csv(r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_2w.csv')
 
 
 def convert_to_excel():
 
     test_data =     {
-    '1w': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_1w.csv',
-    '2w': r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_2w.csv'
+    '1w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_1w.csv',
+    '2w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_2w.csv'
 }
     writer = pd.ExcelWriter('BTC-USD_sagnal_names.xlsx', engine='xlsxwriter')
     for tf in final_path:
@@ -135,7 +134,7 @@ def add_features(time_frame):
 
     data['peaks_signal'] = 0
 
-    folder = r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed'
+    folder = r'/home/arowent/code/app-test/trading/btc-usd/transformed'
     name = f'BTC-USD_added_{time_frame}.csv'
     data.to_csv(os.path.join(folder, name))
 
@@ -205,12 +204,22 @@ def add_signals(data):
         else: return 0
 
     def name(x):
+        print(f'X:\n{x}')
         if x[0] != 0:
-            return 'Нулевой крест'
+            if x[0] == 1:
+                return 'Нулевой крест (покупка)'
+            else:
+                return 'Нулевой крест (продажа)'
         elif x[1] != 0:
-            return 'Блюдце'
+            if x[1] == 1:
+                return 'Блюдце (покупка)'
+            else:
+                return 'Блюдце (продажа)'
         elif x[2] != 0:
-            return 'Два пика'
+            if x[2] == 1:
+                return 'Два пика (покупка)'
+            else:
+                return 'Два пика (продажа)'
         else: return None
 
     data['zero_cross_signal'] = data[['color', 'color_lag_1', 'color_lag_2', 'ao', 'ao_lag_1', 'ao_lag_2']].apply(zero_cross, axis=1)
@@ -229,7 +238,7 @@ def add_signals(data):
 
 
 def main():
-    df = pd.read_csv(r'C:\Users\ollko\Desktop\EmEl\1_traders\data\btc-usd\transformed\BTC-USD_added_4h.csv')
+    df = pd.read_csv(r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_4h.csv')
     df = add_signals(df)
     df = df[['timestamp', 'open', 'high', 'low', 'close', 'volume', 'signal', 'signal_name']]
     df.to_csv('btc_usd_4h.csv')
