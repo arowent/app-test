@@ -289,7 +289,7 @@ def main(argv):
              'close', 'volume', 'signal', 'signal_name']]
     df = df_replace(df)
     df.to_csv(
-        '/home/arowent/code/app-test/trading/btc-usd/final/btc_usd_{}.csv'.format(argv.timeframe))
+        'trading/btc-usd/final/btc_usd_{}.csv'.format(argv.timeframe))
     # df.to_csv('btc_usd_4h.csv')
 
 
