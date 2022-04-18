@@ -2,7 +2,7 @@ from ast import arguments
 from email.headerregistry import Address
 import socket
 import sys
-
+from pathlib import Path
 import psutil
 
 HELP_TEXT = """порядок вызова: python {program_name:s}

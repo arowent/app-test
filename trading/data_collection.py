@@ -6,6 +6,9 @@ from pandas.core.indexes.base import Index
 from ta import momentum
 import sys
 import argparse
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 PATH = r'C:\Users\ollko\Desktop\EmEl\btc-usd'
 PATHS = {
@@ -275,18 +278,21 @@ def df_replace(df):
     df['AO SELL'] = df_sell
     df['AO BUY'] = df_buy
     return df
-    
 
 
 def main(argv):
-    df = pd.read_csv(r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_{}.csv'.format(argv.timeframe))
+    path = Path(BASE_DIR, 'btc-usd', 'transformed', 'BTC-USD_added_{}.csv'.format(argv.timeframe))
+    print(path)
+    df = pd.read_csv(path)
     df = add_signals(df)
-    df = df[['timestamp', 'open', 'high', 'low', 'close', 'volume', 'signal', 'signal_name']]
+    df = df[['timestamp', 'open', 'high', 'low',
+             'close', 'volume', 'signal', 'signal_name']]
     df = df_replace(df)
-    df.to_csv('/home/arowent/code/app-test/trading/btc-usd/final/btc_usd_{}.csv'.format(argv.timeframe))
+    df.to_csv(
+        '/home/arowent/code/app-test/trading/btc-usd/final/btc_usd_{}.csv'.format(argv.timeframe))
     # df.to_csv('btc_usd_4h.csv')
 
-    
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='List of arguments passed to execute the program.')
