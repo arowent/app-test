@@ -275,14 +275,18 @@ def df_replace(df):
         'Два пика (продажа)'
     ], np.nan)
     df = df.drop(['signal', 'signal_name'], axis=1)
+    df['AO'] = momentum.awesome_oscillator(high=df['high'], low=df['low'],
+                                           window1=5, window2=34, fillna=False)
     df['AO SELL'] = df_sell
     df['AO BUY'] = df_buy
+
     return df
 
 
 def main(argv):
     if argv.timeframe is not None:
-        path = Path(BASE_DIR, 'btc-usd', 'transformed', 'BTC-USD_added_{}.csv'.format(argv.timeframe))
+        path = Path(BASE_DIR, 'btc-usd', 'transformed',
+                    'BTC-USD_added_{}.csv'.format(argv.timeframe))
         df = pd.read_csv(path)
         df = add_signals(df)
         df = df[['timestamp', 'open', 'high', 'low',
