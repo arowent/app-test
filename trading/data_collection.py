@@ -281,16 +281,17 @@ def df_replace(df):
 
 
 def main(argv):
-    path = Path(BASE_DIR, 'btc-usd', 'transformed', 'BTC-USD_added_{}.csv'.format(argv.timeframe))
-    print(path)
-    df = pd.read_csv(path)
-    df = add_signals(df)
-    df = df[['timestamp', 'open', 'high', 'low',
-             'close', 'volume', 'signal', 'signal_name']]
-    df = df_replace(df)
-    df.to_csv(
-        'trading/btc-usd/final/btc_usd_{}.csv'.format(argv.timeframe))
-    # df.to_csv('btc_usd_4h.csv')
+    if argv.timeframe is not None:
+        path = Path(BASE_DIR, 'btc-usd', 'transformed', 'BTC-USD_added_{}.csv'.format(argv.timeframe))
+        df = pd.read_csv(path)
+        df = add_signals(df)
+        df = df[['timestamp', 'open', 'high', 'low',
+                'close', 'volume', 'signal', 'signal_name']]
+        df = df_replace(df)
+        df.to_csv(
+            'trading/btc-usd/final/btc_usd_{}.csv'.format(argv.timeframe))
+    else:
+        print('Please enter \'timeframe\'.')
 
 
 if __name__ == '__main__':
