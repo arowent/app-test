@@ -1,9 +1,11 @@
+from matplotlib.pyplot import axis
 import pandas as pd
 import os
 import numpy as np
 from pandas.core.indexes.base import Index
 from ta import momentum
 import sys
+import argparse
 
 PATH = r'C:\Users\ollko\Desktop\EmEl\btc-usd'
 PATHS = {
@@ -44,14 +46,16 @@ final_path = {
     '1w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_1w.csv',
     '2w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_2w.csv'
 }
+
+
 def add_missing_tf():
     ohlc_dict = {
-        'open':'first',
-        'high':'max',
-        'low':'min',
-        'close':'last',
-        'volume':'sum'
-        }
+        'open': 'first',
+        'high': 'max',
+        'low': 'min',
+        'close': 'last',
+        'volume': 'sum'
+    }
 
     for tf in PATHS:
         df = pd.read_csv(PATHS[tf], index_col=0)
@@ -60,20 +64,23 @@ def add_missing_tf():
         df.to_csv(PATHS[tf])
         if tf == '1h':
             df = df.resample('3H').agg(ohlc_dict)
-            df.to_csv(r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_3h.csv')
+            df.to_csv(
+                r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_3h.csv')
         elif tf == '1d':
             df = df.resample('7D').agg(ohlc_dict)
-            df.to_csv(r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_1w.csv')
+            df.to_csv(
+                r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_1w.csv')
             df = df.resample('14D').agg(ohlc_dict)
-            df.to_csv(r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_2w.csv')
+            df.to_csv(
+                r'/home/arowent/code/app-test/trading/btc-usd/BTC-USD_2w.csv')
 
 
 def convert_to_excel():
 
-    test_data =     {
-    '1w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_1w.csv',
-    '2w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_2w.csv'
-}
+    test_data = {
+        '1w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_1w.csv',
+        '2w': r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_2w.csv'
+    }
     writer = pd.ExcelWriter('BTC-USD_sagnal_names.xlsx', engine='xlsxwriter')
     for tf in final_path:
         df = pd.read_csv(final_path[tf])
@@ -90,18 +97,25 @@ def add_features(time_frame):
     data = pd.read_csv(PATHS_ALL[time_frame])
     data['ao'] = momentum.awesome_oscillator(high=data['high'], low=data['low'],
                                              window1=5, window2=34, fillna=False)
+
     def coloring(x):
-        if x > 0: return 'red' 
-        elif x <= 0: return 'green'
-        else: return x
+        if x > 0:
+            return 'red'
+        elif x <= 0:
+            return 'green'
+        else:
+            return x
+
     def digi_coloring(x):
-        if x > 0: return 1
-        elif x <= 0: return 0
-        else: return x
+        if x > 0:
+            return 1
+        elif x <= 0:
+            return 0
+        else:
+            return x
     data['color'] = data['ao'].shift(1) - data['ao']
     data['digi_color'] = data['color'].apply(digi_coloring)
     data['color'] = data['color'].apply(coloring)
-
 
     # features for zero-cross signal
     data['ao_lag_1'] = data['ao'].shift(1)
@@ -117,9 +131,11 @@ def add_features(time_frame):
     data['signal'] = 0
 
     # features for two peaks
-    data['list_colors'] = [[np.nan] if x == 0 else data['color'].iloc[np.max([0, x - 100]): x - 2].tolist() for x in range(len(data))]
-    data['digi_list'] = [[np.nan] if x == 0 else data['digi_color'].iloc[np.max([0, x - 100]): x - 1].tolist() for x in range(len(data))]
- 
+    data['list_colors'] = [[np.nan] if x == 0 else data['color'].iloc[np.max(
+        [0, x - 100]): x - 2].tolist() for x in range(len(data))]
+    data['digi_list'] = [[np.nan] if x == 0 else data['digi_color'].iloc[np.max(
+        [0, x - 100]): x - 1].tolist() for x in range(len(data))]
+
     def reverse_fill_nan(x):
         x = x[::-1]
         while len(x) < 100:
@@ -129,7 +145,8 @@ def add_features(time_frame):
     data['list_colors'] = data['list_colors'].apply(reverse_fill_nan)
     data['digi_list'] = data['digi_list'].apply(reverse_fill_nan)
 
-    data['list_ao'] = [[np.nan] if x == 0 else data['ao'].iloc[np.max([0, x - 100]): x - 2].tolist() for x in range(len(data))]
+    data['list_ao'] = [[np.nan] if x == 0 else data['ao'].iloc[np.max(
+        [0, x - 100]): x - 2].tolist() for x in range(len(data))]
     data['list_ao'] = data['list_ao'].apply(reverse_fill_nan)
 
     data['peaks_signal'] = 0
@@ -144,10 +161,10 @@ def add_signals(data):
     # zero-cross signal
     def zero_cross(x):
         if ((x[0] == x[1] == x[2] == 'red')
-            and (x[3] < 0 and x[4] < 0 and x[5] >= 0)):
+                and (x[3] < 0 and x[4] < 0 and x[5] >= 0)):
             return -1
         elif (x[0] == x[1] == x[2] == 'green'
-            and (x[3] > 0 and x[4] > 0 and x[5] <= 0)):
+              and (x[3] > 0 and x[4] > 0 and x[5] <= 0)):
             return 1
         else:
             return 0
@@ -167,8 +184,7 @@ def add_signals(data):
             # return True
             colors_array = x[4][1:-1].split(',')
             ao_array = x[5][1:-1].split(',')
-            
-            
+
             first_ao = ao_array[0]
             first_color = colors_array[0]
             flag = False
@@ -182,29 +198,32 @@ def add_signals(data):
                     # print(int(float(first_color)) == int(float(colors_array[i])))
                     # print(flag)
                     return False
-                
+
                 # print(float(colors_array[i]))
                 # print(float(first_color))
                 if not np.isnan(float(colors_array[i])) and not np.isnan(float(first_color)) and int(float(colors_array[i])) != int(float(first_color)):
                     flag = True
                 if not np.isnan(float(colors_array[i])) and not np.isnan(float(first_color)) and int(float(colors_array[i])) == int(float(first_color)) and flag:
                     if np.abs(float(ao_array[i])) - np.abs(float(first_ao)) > 0:
-                        return True 
-                    else: return False
+                        return True
+                    else:
+                        return False
 
         if x[0] > 0 and x[1] == x[2] == 'red' and x[3] == 'green':
             if verify():
                 return -1
-            else: return 0
+            else:
+                return 0
 
         elif x[0] < 0 and x[1] == x[2] == 'green' and x[3] == 'red':
             if verify():
                 return 1
-            else: return 0
-        else: return 0
+            else:
+                return 0
+        else:
+            return 0
 
     def name(x):
-        print(f'X:\n{x}')
         if x[0] != 0:
             if x[0] == 1:
                 return 'Нулевой крест (покупка)'
@@ -220,56 +239,58 @@ def add_signals(data):
                 return 'Два пика (покупка)'
             else:
                 return 'Два пика (продажа)'
-        else: return None
+        else:
+            return None
 
-    data['zero_cross_signal'] = data[['color', 'color_lag_1', 'color_lag_2', 'ao', 'ao_lag_1', 'ao_lag_2']].apply(zero_cross, axis=1)
-    
-    
-    data['bludce_signal'] = data[['color', 'color_lag_1', 'color_lag_2']].apply(bludce, axis=1)
+    data['zero_cross_signal'] = data[['color', 'color_lag_1', 'color_lag_2',
+                                      'ao', 'ao_lag_1', 'ao_lag_2']].apply(zero_cross, axis=1)
+
+    data['bludce_signal'] = data[['color', 'color_lag_1',
+                                  'color_lag_2']].apply(bludce, axis=1)
     # data['signal_name'] = data['bludce_signal'].apply(lambda x: x if x == 0 else 'Блюдце')
-    
-    data['two_peaks_signal'] = data[['ao', 'color', 'color_lag_1', 'color_lag_2', 'digi_list', 'list_ao']].apply(two_peaks, axis=1)
+
+    data['two_peaks_signal'] = data[['ao', 'color', 'color_lag_1',
+                                     'color_lag_2', 'digi_list', 'list_ao']].apply(two_peaks, axis=1)
     # data['signal_name'] = data['two_peaks_signal'].apply(lambda x: x if x == 0 else 'Два пика')
-    data['signal_name'] = data[['zero_cross_signal', 'bludce_signal', 'two_peaks_signal']].apply(name, axis=1)
+    data['signal_name'] = data[['zero_cross_signal',
+                                'bludce_signal', 'two_peaks_signal']].apply(name, axis=1)
     # combine
-    data['signal'] = data['two_peaks_signal'] + data['zero_cross_signal'] + data['bludce_signal']
+    data['signal'] = data['two_peaks_signal'] + \
+        data['zero_cross_signal'] + data['bludce_signal']
     return data
 
 
+def df_replace(df):
+    df_sell = df['signal_name'].replace([
+        'Нулевой крест (покупка)',
+        'Блюдце (покупка)',
+        'Два пика (покупка)'
+    ], np.nan)
+    df_buy = df['signal_name'].replace([
+        'Нулевой крест (продажа)',
+        'Блюдце (продажа)',
+        'Два пика (продажа)'
+    ], np.nan)
+    df = df.drop(['signal', 'signal_name'], axis=1)
+    df['AO SELL'] = df_sell
+    df['AO BUY'] = df_buy
+    return df
+    
 
-def main():
-    df = pd.read_csv(r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_4h.csv')
+
+def main(argv):
+    df = pd.read_csv(r'/home/arowent/code/app-test/trading/btc-usd/transformed/BTC-USD_added_{}.csv'.format(argv.timeframe))
     df = add_signals(df)
     df = df[['timestamp', 'open', 'high', 'low', 'close', 'volume', 'signal', 'signal_name']]
-    df.to_csv('btc_usd_4h.csv')
+    df = df_replace(df)
+    df.to_csv('/home/arowent/code/app-test/trading/btc-usd/final/btc_usd_{}.csv'.format(argv.timeframe))
+    # df.to_csv('btc_usd_4h.csv')
+
     
-    
-    # tf = '5m'
-    # convert_to_excel()
-
-    # data = pd.read_csv(r'C:\Users\ollko\Desktop\EmEl\btc-usd\transformed\BTC-USD_added_1w.csv')
-    # data = add_signals(data)
-    # data['signal'] = data['two_peaks_signal'] + data['zero_cross_signal'] + data['bludce_signal']
-
-    # print(data['two_peaks_signal'].value_counts())
-
-    # ax1 = plt.subplot2grid((10,1), (0,0), rowspan = 5, colspan = 1)
-    # ax2 = plt.subplot2grid((10,1), (6,0), rowspan = 4, colspan = 1)
-    # ax1.plot(data['close'])
-    # ax1.set_title('BITCOIN CLOSING PRICE')
-    # for i in range(1, len(data)):
-    #     if data['ao'][i-1] > data['ao'][i]:
-    #         ax2.bar(data.index[i], data['ao'][i], color = '#f44336')
-    #     else:
-    #         ax2.bar(data.index[i], data['ao'][i], color = '#26a69a')
-    # ax2.set_title('BITCOIN AWESOME OSCILLATOR 5,34')
-    # plt.show()
-
-    # data['list_ao'] = data['list_ao'].apply(lambda x: x[1:-1].split(','))
-
-    # data['check'] = data['list_ao'].apply(lambda x: len(x))
-    # data['first'] = data['list_ao'].apply(lambda x: x[0])
-
-    # print(data[['check', 'first']])
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        description='List of arguments passed to execute the program.')
+    parser.add_argument('-t', '--timeframe',
+                        help='specify a \'timeframe\', например: [15m, 1h, 1d, 1w]')
+    argv = parser.parse_args()
+    main(argv)
