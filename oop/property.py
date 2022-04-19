@@ -7,12 +7,11 @@ class Person:
 
     def __init__(self, fio, old, ps, weight) -> None:
         self.verify_fio(fio)
-        self.verify_old(old)
         self.verify_weight(weight)
         self.verify_ps(ps)
 
         self.__fio = fio.split()
-        self.__old = old
+        self.old = old
         self.__ps = ps
         self.__weight = weight
 
